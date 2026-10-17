@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iman Anvari</title>
+  <meta name="description" content="Iman Anvari — projects, experiments, and things I build.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="name">Iman Anvari</a>
+    <nav>
+      <a href="#projects">Projects</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1>Hi, I'm Iman.</h1>
+      <p>This is where I host my projects and experiments. Replace this paragraph with a short line about what you make.</p>
+    </section>
+
+    <section id="projects" class="projects">
+      <h2>Projects</h2>
+      <div class="grid">
+        <!-- Copy this card for each project. -->
+        <article class="card">
+          <h3>Project name</h3>
+          <p>One or two sentences about what it is and why it exists.</p>
+          <a href="#" class="card-link">View project →</a>
+        </article>
+
+        <article class="card">
+          <h3>Project name</h3>
+          <p>One or two sentences about what it is and why it exists.</p>
+          <a href="#" class="card-link">View project →</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <h2>About</h2>
+      <p>A few lines about you, what you're working on, and what you're interested in.</p>
+    </section>
+
+    <section id="contact" class="contact">
+      <h2>Contact</h2>
+      <p>Email: <a href="mailto:imananvariforwork@gmail.com">imananvariforwork@gmail.com</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> Iman Anvari</p>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
