@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Iman Anvari</title>
+<meta name="description" content="Iman Anvari — projects &amp; experiments, 2026.">
+<meta name="theme-color" content="#2108c9">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@400;700&family=IBM+Plex+Mono&family=Noto+Naskh+Arabic:wght@700&display=swap">
+<style>
+/* a golden rectangle, squares shrinking by φ, turning forever around its eye */
+:root{
+  --paper:#2108c9; --ink:#fff; --soft:#c9c2ff; --loop:#b9b0ff;
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;
+  --body:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --naskh:"Noto Naskh Arabic","Geeza Pro",Tahoma,serif;
+  --spring:cubic-bezier(.3,1.5,.5,1);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0d0458;--soft:#a79ef0;--loop:#6f62e0}}
+:root[data-theme="dark"]{--paper:#0d0458;--soft:#a79ef0;--loop:#6f62e0}
+
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;transition:background .618s}
+
+#geo{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;color:var(--loop)}
+#geo rect{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:2 7;vector-effect:non-scaling-stroke;opacity:.6}
+#spiral{fill:none;stroke:var(--ink);stroke-width:1.25;stroke-dasharray:14 9;vector-effect:non-scaling-stroke;animation:march 40s linear infinite}
+@keyframes march{to{stroke-dashoffset:-460}}
+
+#stage{position:fixed;inset:0;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.sq{position:absolute;left:0;top:0;width:1000px;height:1000px;transform-origin:0 0}
+.rot{position:absolute;inset:0;overflow:hidden}
+.card{position:absolute;inset:0;transition:opacity .618s}
+.card.past{opacity:.22}
+.sq.nav{cursor:pointer}
+
+/* the links — 1000 design px per square */
+.t{position:absolute;left:64px;bottom:150px;font:700 120px/1 var(--body);letter-spacing:-.04em;color:var(--ink);text-decoration:none;white-space:nowrap}
+.t .w{position:relative;display:inline-block}
+.t.name{font:400 236px/.9 var(--display);letter-spacing:-.03em}
+.t.fa{left:auto;right:64px;font:700 120px/1.2 var(--naskh);letter-spacing:0}
+.tag{position:absolute;left:.04em;bottom:100%;margin-bottom:.12em;font:400 26px/1 var(--mono);letter-spacing:.08em;color:var(--soft)}
+.small{position:absolute;left:64px;bottom:88px;font:400 30px/1 var(--mono);color:var(--soft);text-decoration:none;white-space:nowrap}
+.small.r{left:auto;right:64px}
+a.small::after{content:"";display:inline-block;width:0;margin-left:14px;vertical-align:middle;border-top:2px dashed currentColor;transition:width .618s var(--spring)}
+a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
+
+/* what grows out of each link */
+.g{position:absolute;overflow:visible;pointer-events:none}
+.g .s{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.g .o{fill:none;stroke:var(--ink);stroke-width:2.5}
+.g .f{fill:var(--ink)}
+.g .c.o{fill:var(--paper)}
+.d{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .382s ease}
+.p{transform:scale(0);transform-box:fill-box;transform-origin:center;transition:transform .382s ease}
+.c{opacity:0;transform-box:view-box;transform-origin:4px 128px;transition:transform .382s ease,opacity .2s}
+.ghost{position:absolute;left:0;top:100%;opacity:.3;pointer-events:none;transform-origin:0 0;transform:scale(1,0) translateY(-100%);transition:transform .382s ease;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 10%,#000);mask-image:linear-gradient(to bottom,transparent 10%,#000)}
+.orb,.orb2{transform-box:view-box}
+.orb{transform-origin:57px 57px}.orb2{transform-origin:91px 57px}
+
+.card.on .d,.t:hover .d{stroke-dashoffset:0;transition:stroke-dashoffset 1s cubic-bezier(.6,0,.2,1) calc(var(--i,0) * .08s + .12s)}
+.card.on .p,.t:hover .p{transform:scale(1);transition:transform .618s var(--spring) calc(var(--i,0) * .05s + .2s)}
+.card.on .c,.t:hover .c{opacity:1;transform:rotate(var(--a));transition:transform .9s var(--spring) calc(var(--i) * .06s + .1s),opacity .2s calc(var(--i) * .06s + .1s)}
+.card.on .ghost,.t:hover .ghost{transform:scale(1,-1) translateY(-100%);transition:transform 1s var(--spring) .12s}
+.card.on .orb,.t:hover .orb{animation:spin 6.18s linear infinite}
+.trig{opacity:0}
+.card.on .trig,.t:hover .trig{animation:trig 1.6s steps(1) infinite;animation-delay:calc(var(--d) + .9s)}
+@keyframes trig{0%{opacity:1}12%,100%{opacity:0}}
+.card.on .orb2,.t:hover .orb2{animation:spin 3.82s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* light/dark: a single dot — solid by day, a ring by night */
+.theme{position:fixed;z-index:3;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));
+  width:36px;height:36px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.theme::before{content:"";width:12px;height:12px;border-radius:50%;box-sizing:border-box;border:1.5px solid var(--ink);background:var(--ink);
+  transition:background .382s,transform .618s var(--spring)}
+.theme:hover::before{transform:scale(1.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme::before{background:transparent}}
+:root[data-theme="dark"] .theme::before{background:transparent}
+.theme:focus-visible,.t:focus-visible{outline:2px dashed var(--ink);outline-offset:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){#spiral{animation:none}*{transition-duration:0s!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg id="geo" aria-hidden="true"><g id="geoG"><g id="rects"></g><path id="spiral"/></g></svg>
+<main id="stage" aria-label="Projects on a golden spiral. Scroll, swipe or use the arrow keys."></main>
+<button class="theme" id="theme" aria-label="Switch light or dark"></button>
+<nav class="sr" id="links" aria-label="Links">
+  <a href="https://esoterorist.github.io/Seven-Tarots/">Seven Tarots</a>
+  <a href="https://esoterorist.github.io/Hextrigs/">Hextrigs</a>
+  <a href="https://esoterorist.github.io/Orpheus/">Orpheus</a>
+  <a href="https://esoterorist.github.io/DiagramMuseum/">Diagram Museum</a>
+  <a href="https://esoterorist.github.io/Saadi/" lang="fa">سفرهای سعدی</a>
+  <a href="https://esoterorist.github.io/calender/">imz Calender</a>
+  <a href="https://are.na/i-a-tm-ild_dlli">Are.na</a>
+  <a href="mailto:iiman.anvarii@gmail.com">iiman.anvarii@gmail.com</a>
+</nav>
+<noscript><style>#links{position:static;width:auto;height:auto;clip:auto;display:flex;flex-direction:column;gap:14px;padding:40px;font:700 26px var(--body)}#links a{color:#fff}</style></noscript>
+
+<script>
+(()=>{
+/* ---------- the golden function ---------- */
+const PHI=(1+Math.sqrt(5))/2, HP=Math.PI/2, GA=Math.PI*(3-Math.sqrt(5)), N=8;
+const D=1+1/(PHI*PHI), P={x:PHI/D,y:1/D}, V0={x:-P.x,y:1-P.y};   // P: the eye, where every square converges
+const mod=(a,n)=>((a%n)+n)%n, f5=v=>+v.toFixed(5), f1=v=>v.toFixed(1);
+const rot=(a,v)=>{const c=Math.cos(a),s=Math.sin(a);return{x:c*v.x-s*v.y,y:s*v.x+c*v.y}};
+const Tk=(k,v)=>{const sc=PHI**-k,r=rot(k*HP,{x:v.x-P.x,y:v.y-P.y});return{x:P.x+sc*r.x,y:P.y+sc*r.y}};
+const spiral=s=>{const sc=PHI**-s,r=rot(s*HP,V0);return{x:P.x+sc*r.x,y:P.y+sc*r.y}};
+const squareK=k=>{const a=Tk(k,{x:0,y:0}),b=Tk(k,{x:1,y:1});return{x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w:Math.abs(b.x-a.x),h:Math.abs(b.y-a.y)}};
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $=s=>document.querySelector(s);
+
+/* ---------- what grows, per link (1 unit = 1 design px at the base size) ---------- */
+const svg=(style,vb,body)=>`<svg class="g" style="${style}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
+const G={
+  // a stem, a leaf, a head of seeds on the golden angle
+  flower(){let h="";for(let n=1;n<=21;n++){const r=19*Math.sqrt(n/21),a=n*GA;h+=`<circle class="f p" style="--i:${(6+n*.35).toFixed(2)}" cx="${f1(46+r*Math.cos(a))}" cy="${f1(62+r*Math.sin(a))}" r="${(2.2+n*.1).toFixed(2)}"/>`}
+    return svg("left:100%;bottom:.04em;margin-left:.05em;width:.42em;height:1.05em","0 0 92 231",
+      `<path class="s d" pathLength="1" d="M14 231C10 190 40 150 46 70"/><path class="f p" style="--i:4" d="M30 168C14 160 8 146 12 136C26 142 32 154 30 168Z"/>${h}`)},
+  // seven cards fan out
+  cards(){let h="";for(let i=0;i<7;i++)h+=`<rect class="c ${i===6?"f":"o"}" style="--i:${i};--a:${i*7}deg" x="4" y="73" width="34" height="55" rx="3"/>`;
+    return svg("left:100%;bottom:.04em;margin-left:.1em;width:1.25em;height:1.45em","0 0 114 132",h)},
+  // six hex trigs pop up, then fire in a pattern
+  hex(){const C=[[20,100],[52,100],[84,100],[36,72],[68,72],[52,44]],D=[0,.8,.4,1.2,.2,1],
+      hp=(x,y,r)=>"M"+[0,1,2,3,4,5].map(k=>{const a=(k*60-90)*Math.PI/180;return f1(x+r*Math.cos(a))+","+f1(y+r*Math.sin(a))}).join("L")+"Z";
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:.88em;height:1em","0 0 106 120",
+      C.map((c,i)=>`<path class="o p" style="--i:${i*1.2}" d="${hp(c[0],c[1],16)}"/><path class="f trig" style="--d:${D[i]}s" d="${hp(c[0],c[1],10)}"/>`).join(""))},
+  // a little diagram draws itself
+  diagram(){const A=[14,100],B=[70,16],C=[142,64],Dd=[80,80],e=[[A,B],[B,C],[C,Dd],[Dd,A],[B,Dd]];
+    return svg("right:0;bottom:100%;margin-bottom:.06em;width:1.3em;height:.95em","0 0 156 114",
+      e.map((p,i)=>`<path class="s d" pathLength="1" style="--i:${i}" d="M${p[0]}L${p[1]}"/>`).join("")+
+      `<circle class="f p" style="--i:0" cx="14" cy="100" r="7"/><rect class="f p" style="--i:2" x="63" y="9" width="14" height="14"/><circle class="o p" style="--i:4" cx="142" cy="64" r="8"/><circle class="f p" style="--i:6" cx="80" cy="80" r="5"/>`)},
+  // a caravan of dots wanders off toward a far city
+  route(){let h="";const q=t=>{const u=1-t;return[u*u*256+2*u*t*150+t*t*14,u*u*124+2*u*t*20+t*t*24]};
+    for(let i=0;i<=15;i++){const p=q(i/15);h+=`<circle class="f p" style="--i:${i}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="${i?3.4:6}"/>`}
+    return svg("right:0;bottom:100%;margin-bottom:-.1em;width:2.2em;height:1.1em","0 0 264 132",h+`<circle class="o p" style="--i:17" cx="14" cy="24" r="11"/>`)},
+  // this month, filling in, today solid
+  month(){const d=new Date(),y=d.getFullYear(),m=d.getMonth(),days=new Date(y,m+1,0).getDate(),start=(new Date(y,m,1).getDay()+6)%7;let h="";
+    for(let n=1;n<=days;n++){const c=(start+n-1)%7,r=Math.floor((start+n-1)/7),x=9+c*17,yy=9+r*17,today=n===d.getDate();
+      h+=`<circle class="${today?"f":"o"} p" style="--i:${(n*.32).toFixed(2)}" cx="${x}" cy="${yy}" r="${today?7:5.5}"/>`}
+    return svg("right:0;bottom:100%;margin-bottom:.1em;width:1.3em;height:1.15em","0 0 120 106",h)},
+  // a circle riding a circle
+  epicycle(){return svg("left:100%;bottom:0;margin-left:.08em;width:.95em;height:.95em","0 0 114 114",
+      `<circle class="o d" pathLength="1" cx="57" cy="57" r="34"/><circle class="f p" cx="57" cy="57" r="3"/>
+       <g class="orb"><circle class="o p" style="--i:6" cx="91" cy="57" r="14"/><g class="orb2"><circle class="f p" style="--i:9" cx="105" cy="57" r="4.5"/></g></g>`)},
+  // blocks, connected
+  blocks(){const B=[[2,90],[34,90],[34,58],[66,58],[66,26],[96,0]];let l="",r="";
+    B.forEach((b,i)=>{r+=`<rect class="${i===5?"f":"o"} p" style="--i:${i*1.4}" x="${b[0]}" y="${b[1]}" width="22" height="22"/>`;
+      if(i)l+=`<path class="s d" pathLength="1" style="--i:${i}" d="M${B[i-1][0]+11} ${B[i-1][1]+11}L${b[0]+11} ${b[1]+11}"/>`});
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.15em;height:1.09em","0 0 120 114",`<g style="opacity:.55">${l}</g>`+r)}
+};
+
+const ITEMS=[
+ {slug:"",title:"Iman Anvari",max:720,
+  html:()=>`<span class="t name" role="heading" aria-level="1"><span class="w">Iman Anvari${G.flower()}</span></span>
+    <span class="small">Projects &amp; Experiments, 2026</span><span class="small r" aria-hidden="true">scroll ↘</span>`},
+ {slug:"seven-tarots",title:"Seven Tarots",href:"https://esoterorist.github.io/Seven-Tarots/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Seven Tarots${G.cards()}</span></a>`},
+ {slug:"hextrigs",title:"Hextrigs",href:"https://esoterorist.github.io/Hextrigs/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Hextrigs${G.hex()}</span></a>`},
+ {slug:"orpheus",title:"Orpheus",href:"https://esoterorist.github.io/Orpheus/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Orpheus<span class="ghost" aria-hidden="true">Orpheus</span></span></a>`},
+ {slug:"diagram-museum",title:"Diagram Museum",href:"https://esoterorist.github.io/DiagramMuseum/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Diagram Museum${G.diagram()}</span></a>`},
+ {slug:"saadi",title:"سفرهای سعدی",href:"https://esoterorist.github.io/Saadi/",max:872,
+  html:i=>`<a class="t fa" href="${i.href}" lang="fa" dir="rtl"><span class="w">سفرهای سعدی${G.route()}</span></a>`},
+ {slug:"calender",title:"imz Calender",href:"https://esoterorist.github.io/calender/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">imz Calender${G.month()}</span></a>`},
+ {slug:"arena",title:"Are.na",href:"https://are.na/i-a-tm-ild_dlli",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Are.na${G.blocks()}</span></a><a class="small" href="mailto:iiman.anvarii@gmail.com">iiman.anvarii@gmail.com</a>`}
+];
+/* Epicycle has no link yet. When it does, add it here:
+ {slug:"epicycle",title:"Epicycle",href:"https://…",max:760,html:i=>`<a class="t" href="${i.href}"><span class="w">Epicycle${G.epicycle()}</span></a>`},
+ and change N above to 9. */
+
+/* ---------- stage ---------- */
+const stage=$("#stage"),geoG=$("#geoG"),KMIN=-2,KMAX=11;
+{let r="";for(let k=-5;k<=22;k++){const q=squareK(k);r+=`<rect x="${f5(q.x)}" y="${f5(q.y)}" width="${f5(q.w)}" height="${f5(q.h)}"/>`}$("#rects").innerHTML=r;
+ let d="";for(let i=0;i<=1300;i++){const p=spiral(-5+i/50);d+=(i?"L":"M")+f5(p.x)+","+f5(p.y)}$("#spiral").setAttribute("d",d)}
+
+let W=0,H=0,S=1,R0=0,Ps={x:0,y:0},FV=0;
+function fitType(node){node._fv=FV;
+  node.querySelectorAll(".t").forEach(t=>{t.style.fontSize="";const it=node._it,w=t.querySelector(".w").scrollWidth;
+    if(w>it.max)t.style.fontSize=(parseFloat(getComputedStyle(t).fontSize)*it.max/w).toFixed(1)+"px"})}
+function make(abs){const it=ITEMS[mod(abs,N)],el=document.createElement("div");el.className="card";el.innerHTML=it.html(it);el._it=it;return el}
+const slots=[];
+for(let k=KMIN;k<=KMAX;k++){const sq=document.createElement("div"),r=document.createElement("div");sq.className="sq";r.className="rot";sq.appendChild(r);stage.appendChild(sq);slots.push({k,sq,rot:r,node:null})}
+
+let B=null;
+function sync(b){
+  const put=(s,n)=>{s.node=n;s.rot.appendChild(n)};
+  if(B===null){B=b;slots.forEach(s=>put(s,make(B+s.k)));return}
+  while(B<b){B++;slots[0].node.remove();for(let i=0;i<slots.length-1;i++)put(slots[i],slots[i+1].node);put(slots.at(-1),make(B+slots.at(-1).k))}
+  while(B>b){B--;slots.at(-1).node.remove();for(let i=slots.length-1;i>0;i--)put(slots[i],slots[i-1].node);put(slots[0],make(B+slots[0].k))}
+}
+
+function fit(){
+  W=innerWidth;H=innerHeight;const land=W/H>=1;R0=land?0:90;
+  S=Math.min(W/(land?PHI:1),H/(land?1:PHI))*.92;
+  const d=rot(R0*Math.PI/180,{x:P.x-PHI/2,y:P.y-.5});Ps={x:W/2+S*d.x,y:H/2+S*d.y};
+  slots.forEach(s=>s.rot.style.transform=`rotate(${-R0}deg)`);kick(true)}
+
+/* ---------- motion: a critically damped spring on t ---------- */
+const hashIdx=()=>{const h=decodeURIComponent(location.hash.slice(1)),i=ITEMS.findIndex(x=>x.slug&&x.slug===h);return i<0?0:i};
+let target=hashIdx(),t=reduce?target:target-1.25,v=0,active=-1,force=true,running=false,last=0;
+const K=reduce?2000:70,DAMP=2*Math.sqrt(K);
+
+function layout(){
+  const b=Math.floor(t),f=t-b;sync(b);
+  const ang=R0*Math.PI/180-f*HP,sc=S*PHI**f,ca=Math.cos(ang)*sc,sa=Math.sin(ang)*sc;
+  geoG.setAttribute("transform",`matrix(${ca} ${sa} ${-sa} ${ca} ${Ps.x-(ca*P.x-sa*P.y)} ${Ps.y-(sa*P.x+ca*P.y)})`);
+  const n=Math.round(t);
+  for(const s of slots){
+    const a=ang+s.k*HP,side=sc*PHI**-s.k,L=side/1000,la=Math.cos(a)*L,lb=Math.sin(a)*L;
+    const tx=Ps.x-1000*(la*P.x-lb*P.y),ty=Ps.y-1000*(lb*P.x+la*P.y),cx=tx+500*(la-lb),cy=ty+500*(lb+la);
+    const vis=side>3&&cx>-side&&cx<W+side&&cy>-side&&cy<H+side;
+    if(vis!==s.vis){s.vis=vis;s.sq.style.visibility=vis?"":"hidden"}
+    if(!vis)continue;
+    s.sq.style.transform=`matrix(${la},${lb},${-lb},${la},${tx},${ty})`;
+    if(s.node._fv!==FV)fitType(s.node);
+    const abs=B+s.k,on=abs===n,past=abs<n,nav=!on&&side>14;
+    const nd=s.node;
+    if(on!==nd._on){nd._on=on;nd.classList.toggle("on",on);nd.setAttribute("aria-hidden",on?"false":"true");nd.querySelectorAll("a").forEach(x=>x.tabIndex=on?0:-1)}
+    if(past!==nd._past){nd._past=past;nd.classList.toggle("past",past)}
+    if(nav!==s.nav){s.nav=nav;s.sq.classList.toggle("nav",nav)}
+  }
+  const ai=mod(n,N);if(ai!==active){active=ai;document.title=ai?`${ITEMS[ai].title} — Iman Anvari`:"Iman Anvari"}
+}
+function frame(now){
+  let dt=Math.min(.05,(now-last)/1000);last=now;
+  while(dt>0){const h=Math.min(dt,1/240);v+=(K*(target-t)-DAMP*v)*h;t+=v*h;dt-=h}
+  const rest=Math.abs(target-t)<1e-4&&Math.abs(v)<1e-4;
+  if(rest){t=target;v=0}
+  layout();force=false;
+  if(rest){running=false;const sl=ITEMS[mod(t,N)].slug;history.replaceState(null,"",sl?"#"+sl:location.pathname+location.search);return}
+  requestAnimationFrame(frame)}
+function kick(f){if(f)force=true;if(!running){running=true;last=performance.now();requestAnimationFrame(frame)}}
+const goTo=x=>{target=x;kick()},go=d=>goTo(Math.round(target)+d);
+const goItem=i=>{const n=Math.round(target);let d=mod(i-n,N);if(d>N/2)d-=N;goTo(n+d)};
+
+/* ---------- input ---------- */
+let snap=0;
+addEventListener("wheel",e=>{e.preventDefault();
+  const m=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1,d=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*m;
+  target+=d/(Math.min(innerWidth,innerHeight)*.8);kick();
+  clearTimeout(snap);snap=setTimeout(()=>goTo(Math.round(target)),130)},{passive:false});
+
+let drag=null,dragged=false;
+stage.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse")return;drag={y:e.clientY,x:e.clientX,t0:target,py:e.clientY,pt:e.timeStamp,vel:0};dragged=false});
+addEventListener("pointermove",e=>{if(!drag)return;
+  const dy=drag.y-e.clientY,dx=drag.x-e.clientX,dd=Math.abs(dy)>=Math.abs(dx)?dy:dx;if(Math.abs(dd)>8)dragged=true;
+  const unit=Math.min(innerWidth,innerHeight)*.55,dt=Math.max(1,e.timeStamp-drag.pt);
+  drag.vel=.75*drag.vel+.25*((drag.py-e.clientY)/dt);drag.py=e.clientY;drag.pt=e.timeStamp;
+  target=drag.t0+dd/unit;kick()});
+const release=()=>{if(!drag)return;goTo(Math.round(target+Math.max(-1.4,Math.min(1.4,drag.vel*.8))));drag=null};
+addEventListener("pointerup",release);addEventListener("pointercancel",release);
+
+stage.addEventListener("click",e=>{
+  if(dragged){e.preventDefault();dragged=false;return}
+  const sq=e.target.closest(".sq");if(!sq)return;const s=slots.find(x=>x.sq===sq);
+  if(!s.node._on){e.preventDefault();goTo(B+s.k);return}
+  if(e.target.closest("a"))return;
+  const it=s.node._it;if(it.href)location.href=it.href;else go(1)});
+
+addEventListener("keydown",e=>{const k=e.key;
+  if(["ArrowDown","ArrowRight","PageDown"," "].includes(k)){e.preventDefault();go(1)}
+  else if(["ArrowUp","ArrowLeft","PageUp"].includes(k)){e.preventDefault();go(-1)}
+  else if(k==="Home"){e.preventDefault();goItem(0)}
+  else if(k==="Enter"&&!e.target.closest("a,button")&&ITEMS[active].href)location.href=ITEMS[active].href});
+addEventListener("hashchange",()=>goItem(hashIdx()));
+addEventListener("resize",fit);
+
+const root=document.documentElement;
+try{const th=localStorage.getItem("theme");if(th)root.dataset.theme=th}catch(e){}
+$("#theme").onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme=dark?"light":"dark";try{localStorage.setItem("theme",root.dataset.theme)}catch(e){}};
+
+fit();
+document.fonts&&document.fonts.ready.then(()=>{FV++;kick(true)});
+})();
+</script>
+</body>
+</html>
