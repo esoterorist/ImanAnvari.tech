@@ -177,4 +177,280 @@ const G={
   // a little diagram draws itself
   diagram(){const A=[14,100],B=[70,16],C=[142,64],Dd=[80,80],e=[[A,B],[B,C],[C,Dd],[Dd,A],[B,Dd]];
     return svg("right:0;bottom:100%;margin-bottom:.06em;width:1.3em;height:.95em","0 0 156 114",
-      e.map((p,i)=>`<path class="s d" pathLength="1"
+      e.map((p,i)=>`<path class="s d" pathLength="1" style="--i:${i}" d="M${p[0]}L${p[1]}"/>`).join("")+
+      `<circle class="f p" style="--i:0" cx="14" cy="100" r="7"/><rect class="f p" style="--i:2" x="63" y="9" width="14" height="14"/><circle class="o p" style="--i:4" cx="142" cy="64" r="8"/><circle class="f p" style="--i:6" cx="80" cy="80" r="5"/>`)},
+  // a caravan of dots wanders off toward a far city
+  route(){let h="";const q=t=>{const u=1-t;return[u*u*256+2*u*t*150+t*t*14,u*u*124+2*u*t*20+t*t*24]};
+    for(let i=0;i<=15;i++){const p=q(i/15);h+=`<circle class="f p" style="--i:${i}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="${i?3.4:6}"/>`}
+    return svg("right:0;bottom:100%;margin-bottom:-.1em;width:2.2em;height:1.1em","0 0 264 132",h+`<circle class="o p" style="--i:17" cx="14" cy="24" r="11"/>`)},
+  // this month, filling in, today solid
+  month(){const d=new Date(),y=d.getFullYear(),m=d.getMonth(),days=new Date(y,m+1,0).getDate(),start=(new Date(y,m,1).getDay()+6)%7;let h="";
+    for(let n=1;n<=days;n++){const c=(start+n-1)%7,r=Math.floor((start+n-1)/7),x=9+c*17,yy=9+r*17,today=n===d.getDate();
+      h+=`<circle class="${today?"f":"o"} p" style="--i:${(n*.32).toFixed(2)}" cx="${x}" cy="${yy}" r="${today?7:5.5}"/>`}
+    return svg("right:0;bottom:100%;margin-bottom:.1em;width:1.3em;height:1.15em","0 0 120 106",h)},
+  // a circle riding a circle
+  epicycle(){return svg("left:100%;bottom:0;margin-left:.08em;width:.95em;height:.95em","0 0 114 114",
+      `<circle class="o d" pathLength="1" cx="57" cy="57" r="34"/><circle class="f p" cx="57" cy="57" r="3"/>
+       <g class="orb"><circle class="o p" style="--i:6" cx="91" cy="57" r="14"/><g class="orb2"><circle class="f p" style="--i:9" cx="105" cy="57" r="4.5"/></g></g>`)},
+  // three reels, the light running through them
+  reels(){const X=[20,47,74];
+    return svg("left:100%;bottom:.1em;margin-left:.14em;width:.96em;height:.4em","0 0 96 40",
+      X.map((x,i)=>`<circle class="o k p" style="--i:${i*2+1}" cx="${x}" cy="20" r="17"/>`).join("")+
+      X.map((x,i)=>`<circle class="f trig" style="--d:${(i*.53).toFixed(2)}s" cx="${x}" cy="20" r="8"/>`).join(""))},
+  // three arcs of sound, pulsing outward
+  waves(){const A=["M10 62Q50 40 90 62","M20 40Q50 22 80 40","M30 19Q50 6 70 19"];
+    return svg("left:100%;bottom:.1em;margin-left:.12em;width:.8em;height:.58em","0 0 100 72",
+      A.map((d,i)=>`<path class="s d wv" pathLength="1" style="--i:${i*2};--d:${(i*.3).toFixed(1)}s;stroke-width:${9-i*1.5}" d="${d}"/>`).join(""))},
+  // an open book; its pages turn
+  book(){const L="M60 22C46 12 24 10 8 14V70C24 66 46 68 60 78",R="M60 22C74 12 96 10 112 14V70C96 66 74 68 60 78",Q="M60 24C72 15 92 13 106 16V68C92 65 72 66 60 75Z";
+    return svg("left:100%;bottom:.06em;margin-left:.14em;width:1em;height:.7em","0 0 120 84",
+      `<path class="s d" pathLength="1" style="--i:0" d="${L}"/><path class="s d" pathLength="1" style="--i:0" d="${R}"/><path class="s d" pathLength="1" style="--i:3" d="M60 22V78"/>`+
+      [0,1,2].map(i=>`<path class="o k pg" style="--d:${(i*.45).toFixed(2)}s;stroke-width:2.5" d="${Q}"/>`).join(""))},
+  // blocks, connected
+  blocks(){const B=[[2,90],[34,90],[34,58],[66,58],[66,26],[96,0]];let l="",r="";
+    B.forEach((b,i)=>{r+=`<rect class="${i===5?"f":"o"} p" style="--i:${i*1.4}" x="${b[0]}" y="${b[1]}" width="22" height="22"/>`;
+      if(i)l+=`<path class="s d" pathLength="1" style="--i:${i}" d="M${B[i-1][0]+11} ${B[i-1][1]+11}L${b[0]+11} ${b[1]+11}"/>`});
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.15em;height:1.09em","0 0 120 114",`<g style="opacity:.55">${l}</g>`+r)}
+};
+
+/* ---------- the name's plant: measured from the real letters, so it fits any font ---------- */
+const cv=document.createElement("canvas"),cx=cv.getContext("2d",{willReadFrequently:true});
+function ink(font,fs,ch){                    // scan a glyph: per row, the [left,right] of its ink, relative to pen + baseline
+  const W=Math.ceil(fs*1.2),H=Math.ceil(fs*1.5),ox=Math.round(fs*.25),oy=Math.round(fs*1.15);
+  cv.width=W;cv.height=H;cx.font=font;cx.textBaseline="alphabetic";cx.fillText(ch,ox,oy);
+  const d=cx.getImageData(0,0,W,H).data,rows=[];
+  for(let y=0;y<H;y++){let l=-1,r=-1;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>110){if(l<0)l=x;r=x}rows.push(l<0?null:[l-ox,r-ox])}
+  const top=rows.findIndex(r=>r);return{rows,oy,top:top<0?-fs*.7:top-oy};
+}
+function curve(P){                           // a smooth curve through points, + samples of position / arc length
+  let d=`M${f1(P[0][0])} ${f1(P[0][1])}`;const S=[];let len=0,prev=null;
+  for(let i=0;i<P.length-1;i++){const a=P[i-1]||P[i],b=P[i],c=P[i+1],e=P[i+2]||c;
+    const p1=[b[0]+(c[0]-a[0])/6,b[1]+(c[1]-a[1])/6],p2=[c[0]-(e[0]-b[0])/6,c[1]-(e[1]-b[1])/6];
+    d+=`C${f1(p1[0])} ${f1(p1[1])} ${f1(p2[0])} ${f1(p2[1])} ${f1(c[0])} ${f1(c[1])}`;
+    for(let j=prev?1:0;j<=16;j++){const u=j/16,v=1-u,B=k=>v*v*v*b[k]+3*v*v*u*p1[k]+3*v*u*u*p2[k]+u*u*u*c[k],x=B(0),y=B(1);
+      if(prev)len+=Math.hypot(x-prev.x,y-prev.y);prev={x,y,s:len};S.push(prev)}}
+  S.forEach(p=>p.f=len?p.s/len:0);
+  return{d,near:x=>S.reduce((b,p)=>Math.abs(p.x-x)<Math.abs(b.x-x)?p:b)};
+}
+function plant(node){
+  const t=node.querySelector(".t.name"),w=t.querySelector(".w"),cs=getComputedStyle(t),fs=parseFloat(cs.fontSize);
+  const font=`${cs.fontStyle} ${cs.fontWeight} ${fs}px ${cs.fontFamily}`,E=v=>v*fs,T=v=>v.toFixed(2)+"s";
+  const Ls=[...w.querySelectorAll(".l")].map(s=>({ch:s.textContent,x:s.offsetLeft,w:s.offsetWidth})),n=Ls.length,Li=Ls[n-1];
+  const yb=w.querySelector(".bl").offsetTop,W=w.offsetWidth,H=w.offsetHeight;
+  const gI=ink(font,fs,"I"),gx=ink(font,fs,"x"),gi=ink(font,fs,"i"),yc=yb+gI.top,yx=yb+gx.top;
+  // the I's stem: where it stands, how thick
+  const mid=gI.rows[Math.round(gI.oy+gI.top/2)]||[0,E(.07)],Ix=Ls[0].x+(mid[0]+mid[1])/2,sw=Math.max(2,mid[1]-mid[0]+1);
+  // the dot of the last i: it will open into a daisy
+  let y0=gi.oy+gi.top,y1=y0,l=1e9,r=-1e9;
+  while(gi.rows[y1]){l=Math.min(l,gi.rows[y1][0]);r=Math.max(r,gi.rows[y1][1]);y1++}
+  const dx=Li.x+(l+r)/2,dy=yb+(y0+y1-1)/2-gi.oy,dr=Math.max(r-l+1,y1-y0)/2;
+  // the skyline of the letters in between, so the garland never touches them
+  const pad=Math.ceil(E(.3)),CW=Math.ceil(W)+2*pad,CH=Math.ceil(yb)+2*pad;
+  cv.width=CW;cv.height=CH;cx.font=font;cx.textBaseline="alphabetic";
+  for(let i=1;i<n-1;i++)cx.fillText(Ls[i].ch,Ls[i].x+pad,yb+pad);
+  const px=cx.getImageData(0,0,CW,CH).data,sky=new Float32Array(CW).fill(yb),seen=new Uint8Array(CW);
+  for(let y=0;y<CH;y++)for(let x=0;x<CW;x++)if(!seen[x]&&px[(y*CW+x)*4+3]>90){seen[x]=1;sky[x]=y-pad}
+  const win=E(.07),env=x=>{let m=yb;for(let i=Math.max(0,Math.round(x-win+pad)),e=Math.min(CW-1,Math.round(x+win+pad));i<=e;i++)m=Math.min(m,sky[i]);return m};
+
+  // the garland: from the top of the I, a scallop over every letter, a droop between the words, into the i's dot
+  const cl=E(.06),amp=E(.055),P=[[Ix,yc+E(.03)]],dips=[],tops=[];let droop=null;
+  for(let i=1;i<n;i++){const L=Ls[i];
+    P.push([L.x,Math.min(env(L.x),yx)-cl*.6]);if(i>1&&Ls[i-1].ch!==" "&&L.ch!==" ")dips.push(P.at(-1));
+    if(i===n-1)break;const c=L.x+L.w/2;
+    if(L.ch===" "){P.push([c,yx-cl*.1]);droop=P.at(-1)}else{P.push([c,env(c)-cl-amp]);tops.push({p:P.at(-1),big:L.ch==="A"})}}
+  const ri=dr*1.12;P.push([dx-ri*2.3,dy+ri*.3]);
+  const M=curve(P),tv=.8,dv=2.3,at=x=>tv+dv*M.near(x).f;
+
+  let back="",top="";
+  const line=(d,wd,t0,dur,lin)=>{back+=`<path class="vn d" pathLength="1" style="--t:${T(t0)};--dur:${T(dur)}${lin?";--ez:linear":""}" stroke-width="${f1(wd)}" d="${d}"/>`};
+  const leaf=(x,y,deg,L,Wd,t0)=>{top+=`<g transform="translate(${f1(x)} ${f1(y)}) rotate(${Math.round(deg)})"><path class="lf p" style="--t:${T(t0)}" d="M0 0C${f1(L*.12)} ${f1(-Wd*1.25)} ${f1(L*.78)} ${f1(-Wd*1.3)} ${f1(L)} 0C${f1(L*.78)} ${f1(Wd*1.3)} ${f1(L*.12)} ${f1(Wd*1.25)} 0 0Z"/></g>`};
+  const bud=(x,y,rr,t0)=>{top+=`<circle class="fc p" style="--t:${T(t0)}" cx="${f1(x)}" cy="${f1(y)}" r="${f1(rr)}"/>`};
+  const daisy=(x,y,rr,t0)=>{let h="";for(let k=0;k<6;k++){const a=k*Math.PI/3;h+=`<circle class="fc" cx="${f1(rr*1.55*Math.cos(a))}" cy="${f1(rr*1.55*Math.sin(a))}" r="${f1(rr*.62)}"/>`}
+    top+=`<g transform="translate(${f1(x)} ${f1(y)})"><g class="fl p" style="--t:${T(t0)}"><g class="sw" style="--t:${T(t0)}">${h}<circle class="bd" r="${f1(rr)}"/><circle class="fc" r="${f1(rr*.42)}"/></g></g></g>`};
+
+  // 1 — the I turns into a seedling
+  line(`M${f1(Ix)} ${f1(yb-sw*.45)}C${f1(Ix-E(.01))} ${f1(yb-(yb-yc)*.4)} ${f1(Ix+E(.012))} ${f1(yb-(yb-yc)*.7)} ${f1(Ix)} ${f1(yc+E(.03))}`,sw*.9,.1,.7);
+  leaf(Ix,yc+E(.03),-132,E(.15),E(.055),.6);leaf(Ix,yc+E(.03),-48,E(.15),E(.055),.68);
+  leaf(Ix,yb-E(.01),-168,E(.07),E(.022),.45);leaf(Ix,yb-E(.01),-12,E(.07),E(.022),.5);
+  // 2 — the garland draws across, sprouting as it goes: leaves in every dip, buds and daisies on every scallop
+  line(M.d,E(.028),tv,dv,1);
+  dips.forEach(p=>{const t0=at(p[0]);leaf(p[0],p[1],-128,E(.085),E(.032),t0+.05);leaf(p[0],p[1],-52,E(.085),E(.032),t0+.12)});
+  tops.forEach(({p,big},j)=>{const t0=at(p[0])+.08;
+    if(big||j%3===1)daisy(p[0],p[1]-E(.016),E(big?.042:.034),t0);else bud(p[0],p[1]-E(.036),E(.024),t0)});
+  if(droop){const t0=at(droop[0]);line(`M${f1(droop[0])} ${f1(droop[1])}V${f1(droop[1]+E(.06))}`,E(.014),t0,.3);bud(droop[0],droop[1]+E(.08),E(.028),t0+.2)}
+  // 3 — and the dot of the last i opens into a daisy
+  daisy(dx,dy,ri,tv+dv-.05);
+  return{vb:`0 0 ${W} ${H}`,body:back+top};
+}
+
+const SOC=[
+  {name:"Letterboxd",href:"https://boxd.it/6uYab",g:"reels"},
+  {name:"Spotify",href:"https://open.spotify.com/user/31dxlwhfdibpqjqlg5nhxrflov34",g:"waves"},
+  {name:"Goodreads",href:"https://www.goodreads.com/user/show/100149155",g:"book"},
+  {name:"Are.na",href:"https://are.na/i-a-tm-ild_dlli",g:"blocks"}
+];
+const ITEMS=[
+ {slug:"",title:"Iman Anvari",max:720,grow:plant,
+  html:()=>`<span class="t name" role="heading" aria-level="1" aria-label="Iman Anvari"><span class="w" aria-hidden="true">${[..."Iman Anvari"].map((c,i)=>`<span class="l${i?"":" I"}">${c}</span>`).join("")}<span class="bl"></span><svg class="g vine" aria-hidden="true"></svg></span></span>
+    <span class="small">Projects &amp; Experiments, 2026</span><span class="small r" aria-hidden="true">scroll ↘</span>`},
+ {slug:"sankofa",title:"Sankofa",href:"https://esoterorist.github.io/Sankofa/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Sankofa${G.sankofa()}</span></a>`},
+ {slug:"seven-tarots",title:"Seven Tarots",href:"https://esoterorist.github.io/Seven-Tarots/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Seven Tarots${G.cards()}</span></a>`},
+ {slug:"hextrigs",title:"Hextrigs",href:"https://esoterorist.github.io/Hextrigs/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Hextrigs${G.hex()}</span></a>`},
+ {slug:"orpheus",title:"Orpheus",href:"https://esoterorist.github.io/Orpheus/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Orpheus<span class="ghost" aria-hidden="true">Orpheus</span></span></a>`},
+ {slug:"diagram-museum",title:"Diagram Museum",href:"https://esoterorist.github.io/DiagramMuseum/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Diagram Museum${G.diagram()}</span></a>`},
+ {slug:"saadi",title:"سفرهای سعدی",href:"https://esoterorist.github.io/Saadi/",max:872,
+  html:i=>`<a class="t fa" href="${i.href}" lang="fa" dir="rtl"><span class="w">سفرهای سعدی${G.route()}</span></a>`},
+ {slug:"calender",title:"imz Calender",href:"https://esoterorist.github.io/calender/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">imz Calender${G.month()}</span></a>`},
+ {slug:"elsewhere",title:"Elsewhere",max:760,
+  html:()=>`<div class="list"><span class="tag">elsewhere</span>${SOC.map(s=>`<a class="t" href="${s.href}" rel="me"><span class="w">${s.name}${G[s.g]()}</span></a>`).join("")}</div>
+    <a class="small" href="mailto:iiman.anvarii@gmail.com">iiman.anvarii@gmail.com</a>`}
+];
+const N=ITEMS.length;
+ITEMS.forEach(it=>it._html=it.html(it));   // build each card's markup once
+/* Epicycle has no link yet. When it does, add it to ITEMS:
+ {slug:"epicycle",title:"Epicycle",href:"https://…",max:760,html:i=>`<a class="t" href="${i.href}"><span class="w">Epicycle${G.epicycle()}</span></a>`},
+ (and to the #links nav above). */
+
+/* ---------- stage ---------- */
+const stage=$("#stage"),geoG=$("#geoG"),KMIN=-2,KMAX=11;
+{let r="";for(let k=-4;k<=18;k++){const q=squareK(k);r+=`<rect x="${f5(q.x)}" y="${f5(q.y)}" width="${f5(q.w)}" height="${f5(q.h)}"/>`}$("#rects").innerHTML=r;
+ // the spiral as 44 cubic curves (exact tangents) instead of 1300 straight segments
+ const s0=-4,s1=18,ds=.5;let p=spiral(s0),q=spiralD(s0),d=`M${f5(p.x)},${f5(p.y)}`;
+ for(let s=s0+ds;s<=s1+1e-9;s+=ds){const p2=spiral(s),q2=spiralD(s),k=ds/3;
+   d+=`C${f5(p.x+q.x*k)},${f5(p.y+q.y*k)} ${f5(p2.x-q2.x*k)},${f5(p2.y-q2.y*k)} ${f5(p2.x)},${f5(p2.y)}`;p=p2;q=q2}
+ $("#spiral").setAttribute("d",d)}
+
+let W=0,H=0,S=1,R0=0,Ps={x:0,y:0},FV=0;
+// fit each card's type once per item (not once per card), and grow the plant once per font change
+function prep(node){
+  const it=node._it,ts=node.querySelectorAll(".t"),fresh=it._fv!==FV;
+  if(fresh)it._fs=[...ts].map(t=>{t.style.fontSize="";const w=t.querySelector(".w").scrollWidth;
+    return w>it.max?(parseFloat(getComputedStyle(t).fontSize)*it.max/w).toFixed(1)+"px":""});
+  ts.forEach((t,j)=>t.style.fontSize=it._fs[j]||"");
+  if(it.grow){
+    if(fresh){try{it._g=it.grow(node)}catch(e){it._g=null}}
+    const v=node.querySelector(".vine");
+    if(v&&it._g&&v._fv!==FV){v._fv=FV;v.setAttribute("viewBox",it._g.vb);v.innerHTML=it._g.body;
+      if(node._on){node.classList.remove("on");void node.offsetWidth;node.classList.add("on")}}   // replay, don't pop in
+  }
+  it._fv=FV;node._fv=FV;
+}
+const cards=new Map();   // abs index -> card. A card is built once, then only its transform changes.
+function make(abs){const it=ITEMS[mod(abs,N)],sq=document.createElement("div");sq.className="sq";
+  sq.innerHTML=`<div class="rot" style="transform:rotate(${-R0}deg)"><div class="card" aria-hidden="true">${it._html}</div></div>`;
+  const node=sq.firstChild.firstChild;node._it=it;for(const x of node.querySelectorAll("a"))x.tabIndex=-1;
+  stage.appendChild(sq);return{abs,sq,rot:sq.firstChild,node}}
+
+function fit(){
+  W=innerWidth;H=innerHeight;const land=W/H>=1;R0=land?0:90;
+  S=Math.min(W/(land?PHI:1),H/(land?1:PHI))*.92;
+  const d=rot(R0*Math.PI/180,{x:P.x-PHI/2,y:P.y-.5});Ps={x:W/2+S*d.x,y:H/2+S*d.y};
+  for(const c of cards.values())c.rot.style.transform=`rotate(${-R0}deg)`;kick()}
+
+/* ---------- motion: a critically damped spring on t ---------- */
+const hashIdx=()=>{const h=decodeURIComponent(location.hash.slice(1)),i=ITEMS.findIndex(x=>x.slug&&x.slug===h);return i<0?0:i};
+const goal=hashIdx();
+let t=reduce?goal:goal-1.25,target=t,v=0,active=-1,running=false,last=0;   // hold still until the fonts are in
+const K=reduce?2000:70,DAMP=2*Math.sqrt(K);
+
+function layout(){
+  const b=Math.floor(t),f=t-b,lo=b+KMIN,hi=b+KMAX;
+  for(const [k,c] of cards)if(k<lo||k>hi){c.sq.remove();cards.delete(k)}
+  for(let k=lo;k<=hi;k++)if(!cards.has(k))cards.set(k,make(k));
+  const ang=R0*Math.PI/180-f*HP,sc=S*PHI**f,ca=Math.cos(ang)*sc,sa=Math.sin(ang)*sc;
+  geoG.setAttribute("transform",`matrix(${ca} ${sa} ${-sa} ${ca} ${Ps.x-(ca*P.x-sa*P.y)} ${Ps.y-(sa*P.x+ca*P.y)})`);
+  const n=Math.round(t),r0=R0*Math.PI/180;
+  for(const c of cards.values()){
+    const u=c.abs-t,a=r0+u*HP,side=S*PHI**-u,L=side/1000,la=Math.cos(a)*L,lb=Math.sin(a)*L;
+    const tx=Ps.x-1000*(la*P.x-lb*P.y),ty=Ps.y-1000*(lb*P.x+la*P.y),cx=tx+500*(la-lb),cy=ty+500*(lb+la);
+    const vis=side>5&&cx>-side&&cx<W+side&&cy>-side&&cy<H+side;
+    if(vis!==c.vis){c.vis=vis;c.sq.style.visibility=vis?"":"hidden"}
+    if(!vis)continue;
+    c.sq.style.transform=`matrix(${la},${lb},${-lb},${la},${tx},${ty})`;
+    const nd=c.node;
+    if(nd._fv!==FV)prep(nd);
+    const on=c.abs===n,past=c.abs<n,nav=!on&&side>14;
+    if(on!==nd._on){nd._on=on;nd.classList.toggle("on",on);nd.setAttribute("aria-hidden",on?"false":"true");for(const x of nd.querySelectorAll("a"))x.tabIndex=on?0:-1}
+    if(past!==nd._past){nd._past=past;nd.classList.toggle("past",past)}
+    if(nav!==c.nav){c.nav=nav;c.sq.classList.toggle("nav",nav)}
+  }
+  const ai=mod(n,N);if(ai!==active){active=ai;document.title=ai?`${ITEMS[ai].title} — Iman Anvari`:"Iman Anvari"}
+}
+function frame(now){
+  let dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
+  while(dt>0){const h=Math.min(dt,1/240);v+=(K*(target-t)-DAMP*v)*h;t+=v*h;dt-=h}
+  const rest=Math.abs(target-t)<1e-4&&Math.abs(v)<1e-4;
+  if(rest){t=target;v=0}
+  layout();
+  if(rest){running=false;
+    if(started&&!drag&&Number.isInteger(t)){const sl=ITEMS[mod(t,N)].slug,u=sl?"#"+sl:location.pathname+location.search;
+      if(u!==(sl?location.hash:location.pathname+location.search+location.hash))history.replaceState(null,"",u)}
+    return}
+  requestAnimationFrame(frame)}
+function kick(){if(!running){running=true;last=performance.now();requestAnimationFrame(frame)}}
+const goTo=x=>{target=x;kick()},go=d=>goTo(Math.round(target)+d);
+const goItem=i=>{const n=Math.round(target);let d=mod(i-n,N);if(d>N/2)d-=N;goTo(n+d)};
+
+/* ---------- input ---------- */
+let snap=0,started=false;
+addEventListener("wheel",e=>{e.preventDefault();if(e.ctrlKey||!started)return;
+  const m=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1,d=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*m;
+  target+=d/(Math.min(innerWidth,innerHeight)*.8);kick();
+  clearTimeout(snap);snap=setTimeout(()=>goTo(Math.round(target)),130)},{passive:false});
+
+let drag=null,dragged=false;
+stage.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"||!started)return;
+  drag={id:e.pointerId,y:e.clientY,x:e.clientX,t0:target,pd:0,pt:e.timeStamp,vel:0};dragged=false});
+addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;
+  const dy=drag.y-e.clientY,dx=drag.x-e.clientX,dd=Math.abs(dy)>=Math.abs(dx)?dy:dx;if(Math.abs(dd)>8)dragged=true;
+  const unit=Math.min(innerWidth,innerHeight)*.55,dt=Math.max(1,e.timeStamp-drag.pt);
+  drag.vel=.75*drag.vel+.25*((dd-drag.pd)/dt/unit*1000);drag.pd=dd;drag.pt=e.timeStamp;   // velocity on the same axis as the drag
+  target=drag.t0+dd/unit;kick()});
+const release=e=>{if(!drag||(e&&e.pointerId!==drag.id))return;
+  const fling=e&&e.timeStamp-drag.pt<90?drag.vel*.22:0;drag=null;goTo(Math.round(target+Math.max(-1.4,Math.min(1.4,fling))))};
+addEventListener("pointerup",release);addEventListener("pointercancel",release);
+
+stage.addEventListener("click",e=>{
+  if(dragged){e.preventDefault();dragged=false;return}
+  const sq=e.target.closest(".sq");if(!sq)return;let c=null;for(const x of cards.values())if(x.sq===sq)c=x;if(!c)return;
+  if(!c.node._on){e.preventDefault();goTo(c.abs);return}
+  if(e.target.closest("a"))return;
+  const it=c.node._it;if(it.href)location.href=it.href;else go(1)});
+
+addEventListener("keydown",e=>{const k=e.key;if(e.metaKey||e.ctrlKey||e.altKey||!started)return;
+  if(["ArrowDown","ArrowRight","PageDown"," "].includes(k)){e.preventDefault();go(1)}
+  else if(["ArrowUp","ArrowLeft","PageUp"].includes(k)){e.preventDefault();go(-1)}
+  else if(k==="Home"){e.preventDefault();goItem(0)}
+  else if(k==="End"){e.preventDefault();goItem(N-1)}
+  else if(k==="Enter"&&!e.target.closest("a,button")){const it=ITEMS[active];if(it&&it.href)location.href=it.href}});
+addEventListener("hashchange",()=>goItem(hashIdx()));
+let rz=0;addEventListener("resize",()=>{cancelAnimationFrame(rz);rz=requestAnimationFrame(fit)});
+
+const root=document.documentElement,meta=$('meta[name="theme-color"]');
+const paint=()=>{meta.content=getComputedStyle(root).getPropertyValue("--paper").trim()||"#2108c9"};
+try{const th=localStorage.getItem("theme");if(th==="light"||th==="dark")root.dataset.theme=th}catch(e){}
+$("#theme").onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme=dark?"light":"dark";paint();try{localStorage.setItem("theme",root.dataset.theme)}catch(e){}};
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",paint);
+paint();
+
+fit();
+/* fonts: ask for them by name (fonts.ready alone can resolve before anything has asked), re-fit when they land, then begin */
+const begin=()=>{if(started)return;started=true;goTo(goal)};
+const refit=()=>{FV++;kick()};
+if(document.fonts){
+  Promise.all(["400 236px 'Instrument Serif'","700 120px 'Inter Tight'","400 30px 'IBM Plex Mono'","700 120px 'Noto Naskh Arabic'"]
+    .map(f=>document.fonts.load(f,f.includes("Naskh")?"سعدی":"Iman").catch(()=>{}))).then(()=>{refit();begin()});
+  document.fonts.addEventListener?.("loadingdone",refit);
+}else begin();
+setTimeout(begin,900);
+})();
+</script>
+</body>
+</html>
