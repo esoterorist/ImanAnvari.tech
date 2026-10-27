@@ -52,4 +52,435 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 /* elsewhere: a short stack of links */
 .list{position:absolute;left:64px;bottom:150px}
 .list .tag{position:static;display:block;margin:0 0 22px .04em}
-.list
+.list .t{position:relative;left:auto;bottom:auto;display:block;width:max-content;font-size:100px;line-height:1.12}
+
+/* what grows out of each link */
+.g{position:absolute;overflow:visible;pointer-events:none}
+.g .s{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.g .o{fill:none;stroke:var(--ink);stroke-width:2.5}
+.g .f{fill:var(--ink)}
+.g .c.o,.g .o.k{fill:var(--paper)}
+.d{stroke-dasharray:1 2;stroke-dashoffset:1.001;transition:stroke-dashoffset .382s ease}
+.p{transform:scale(0);transform-box:fill-box;transform-origin:center;transition:transform .382s ease}
+.c{opacity:0;transform-box:view-box;transform-origin:4px 128px;transition:transform .382s ease,opacity .2s}
+.ghost{position:absolute;left:0;top:100%;opacity:.3;pointer-events:none;transform-origin:0 0;transform:scale(1,0) translateY(-100%);transition:transform .382s ease;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 10%,#000);mask-image:linear-gradient(to bottom,transparent 10%,#000)}
+.orb,.orb2,.ph,.pg{transform-box:view-box}
+.orb{transform-origin:57px 57px}.orb2{transform-origin:91px 57px}
+
+.card.on .d,.t:hover .d{stroke-dashoffset:0;transition:stroke-dashoffset 1s cubic-bezier(.6,0,.2,1) calc(var(--i,0) * .08s + .12s)}
+.card.on .p,.t:hover .p{transform:scale(1);transition:transform .618s var(--spring) calc(var(--i,0) * .05s + .2s)}
+.card.on .c,.t:hover .c{opacity:1;transform:rotate(var(--a));transition:transform .9s var(--spring) calc(var(--i) * .06s + .1s),opacity .2s calc(var(--i) * .06s + .1s)}
+.card.on .ghost,.t:hover .ghost{transform:scale(1,-1) translateY(-100%);transition:transform 1s var(--spring) .12s}
+.card.on .orb,.t:hover .orb{animation:spin 6.18s linear infinite}
+.trig{opacity:0}
+.card.on .trig,.t:hover .trig{animation:trig 1.6s steps(1) infinite;animation-delay:calc(var(--d) + .9s)}
+@keyframes trig{0%{opacity:1}12%,100%{opacity:0}}
+.card.on .orb2,.t:hover .orb2{animation:spin 3.82s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* sankofa: a playhead that only ever goes back */
+.ph{opacity:0}
+.card.on .ph,.t:hover .ph{animation:back 2.4s cubic-bezier(.5,0,.5,1) 1.1s infinite}
+@keyframes back{0%{opacity:0;transform:translateX(124px)}12%,85%{opacity:1}100%{opacity:0;transform:translateX(4px)}}
+/* spotify: waves pulse outward */
+.card.on .wv,.t:hover .wv{animation:wave 1.8s ease-in-out infinite;animation-delay:calc(var(--d) + 1.1s)}
+@keyframes wave{0%,100%{opacity:1}50%{opacity:.28}}
+/* goodreads: pages turn, once each */
+.pg{opacity:0;transform-origin:60px 50px}
+.card.on .pg,.t:hover .pg{animation:flip .9s cubic-bezier(.5,0,.3,1) both;animation-delay:calc(var(--d) + 1s)}
+@keyframes flip{0%{opacity:1;transform:scaleX(1)}100%{opacity:1;transform:scaleX(-1)}}
+
+/* the name: its I becomes a plant, and the plant takes the rest of the name */
+.name .bl{display:inline-block;width:0;height:0}
+.name .I{transition:color .35s}
+.card.on .name .I,.t.name:hover .I{color:transparent;transition:color .8s ease .3s}
+.vine{left:0;top:0;width:100%;height:100%}
+.vine .vn,.vine .hl{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.vine .vn{stroke:var(--ink)}
+.vine .hl{stroke:var(--paper)}
+.vine .lb{fill:var(--ink);stroke:var(--paper);paint-order:stroke}
+.vine .rb{fill:none;stroke:var(--paper);stroke-linecap:round}
+.vine .pt{fill:var(--paper);stroke:var(--ink)}
+.vine .fc,.vine .sd{fill:var(--ink)}
+.vine .bd{fill:var(--paper)}
+.vine .lf{transform-origin:0 50%}
+.vine .fl{transform:scale(0) rotate(-72deg)}
+.vine .d{transition:stroke-dashoffset .45s ease}
+.vine .p{transition:transform .35s ease}
+.card.on .vine .d,.t:hover .vine .d{transition:stroke-dashoffset var(--dur,.6s) var(--ez,cubic-bezier(.5,0,.3,1)) var(--t,0s)}
+.card.on .vine .p,.t:hover .vine .p{transition:transform .8s var(--spring) var(--t,0s)}
+.card.on .vine .fl,.t:hover .vine .fl{transform:scale(1) rotate(0deg)}
+
+/* light/dark: a single dot — solid by day, a ring by night */
+.theme{position:fixed;z-index:3;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));
+  width:36px;height:36px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.theme::before{content:"";width:12px;height:12px;border-radius:50%;box-sizing:border-box;border:1.5px solid var(--ink);background:var(--ink);
+  transition:background .382s,transform .618s var(--spring)}
+.theme:hover::before{transform:scale(1.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme::before{background:transparent}}
+:root[data-theme="dark"] .theme::before{background:transparent}
+.theme:focus-visible,.t:focus-visible,.small:focus-visible{outline:2px dashed var(--ink);outline-offset:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){#spiral{animation:none}*{transition-duration:0s!important;transition-delay:0s!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg id="geo" aria-hidden="true"><g id="geoG"><g id="rects"></g><path id="spiral"/></g></svg>
+<main id="stage" aria-label="Projects on a golden spiral. Scroll, swipe or use the arrow keys."></main>
+<button class="theme" id="theme" aria-label="Switch light or dark"></button>
+<nav class="sr" id="links" aria-label="Links">
+  <a href="https://esoterorist.github.io/Sankofa/">Sankofa</a>
+  <a href="https://esoterorist.github.io/Seven-Tarots/">Seven Tarots</a>
+  <a href="https://esoterorist.github.io/Hextrigs/">Hextrigs</a>
+  <a href="https://esoterorist.github.io/Orpheus/">Orpheus</a>
+  <a href="https://esoterorist.github.io/DiagramMuseum/">Diagram Museum</a>
+  <a href="https://esoterorist.github.io/Saadi/" lang="fa">سفرهای سعدی</a>
+  <a href="https://esoterorist.github.io/calender/">imz Calender</a>
+  <a href="https://boxd.it/6uYab" rel="me">Letterboxd</a>
+  <a href="https://open.spotify.com/user/31dxlwhfdibpqjqlg5nhxrflov34" rel="me">Spotify</a>
+  <a href="https://www.goodreads.com/user/show/100149155" rel="me">Goodreads</a>
+  <a href="mailto:iiman.anvarii@gmail.com">iiman.anvarii@gmail.com</a>
+</nav>
+<noscript><style>#links{position:static;width:auto;height:auto;clip:auto;display:flex;flex-direction:column;gap:14px;padding:40px;font:700 26px var(--body)}#links a{color:#fff}</style></noscript>
+
+<script>
+(()=>{
+/* ---------- the golden function ---------- */
+const PHI=(1+Math.sqrt(5))/2, HP=Math.PI/2, GA=Math.PI*(3-Math.sqrt(5)), LN=Math.log(PHI);
+const D=1+1/(PHI*PHI), P={x:PHI/D,y:1/D}, V0={x:-P.x,y:1-P.y};   // P: the eye, where every square converges
+const mod=(a,n)=>((a%n)+n)%n, f5=v=>+v.toFixed(5), f1=v=>v.toFixed(1);
+const rot=(a,v)=>{const c=Math.cos(a),s=Math.sin(a);return{x:c*v.x-s*v.y,y:s*v.x+c*v.y}};
+const Tk=(k,v)=>{const sc=PHI**-k,r=rot(k*HP,{x:v.x-P.x,y:v.y-P.y});return{x:P.x+sc*r.x,y:P.y+sc*r.y}};
+const spiral=s=>{const sc=PHI**-s,r=rot(s*HP,V0);return{x:P.x+sc*r.x,y:P.y+sc*r.y}};
+const V1={x:-LN*V0.x-HP*V0.y,y:-LN*V0.y+HP*V0.x};                 // d/ds of the spiral, before scale + turn
+const spiralD=s=>{const sc=PHI**-s,r=rot(s*HP,V1);return{x:sc*r.x,y:sc*r.y}};
+const squareK=k=>{const a=Tk(k,{x:0,y:0}),b=Tk(k,{x:1,y:1});return{x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w:Math.abs(b.x-a.x),h:Math.abs(b.y-a.y)}};
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $=s=>document.querySelector(s);
+
+/* ---------- what grows, per link (1 unit = 1 design px at the base size) ---------- */
+const svg=(style,vb,body)=>`<svg class="g" style="${style}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
+const G={
+  // sixteen slices of a sound, cut into four, and a playhead that walks back to fetch it
+  sankofa(){const A=[.95,.58,.8,.42,.72,.5,.64,.3,.88,.44,.56,.34,.62,.26,.4,.18];let h="";
+    A.forEach((a,i)=>{const hh=84*a;h+=`<rect class="f p" style="--i:${(i*.45).toFixed(2)}" x="${4+i*8}" y="${f1(56-hh/2)}" width="4.6" height="${f1(hh)}" rx="2.3"/>`});
+    for(let j=1;j<4;j++)h+=`<path class="s d" pathLength="1" style="--i:${4+j*2};stroke-width:2;opacity:.55" d="M${f1(2.3+j*32)} 98V12"/><path class="f p" style="--i:${8+j*1.5}" d="M${f1(-3.7+j*32)} 4h12l-6 7z"/>`;
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.32em;height:1em","0 0 132 100",
+      h+`<g class="ph"><path class="s" style="stroke-width:3.5" d="M0 8V104"/><circle class="f" cx="0" cy="104" r="5"/></g>`)},
+  // seven cards fan out
+  cards(){let h="";for(let i=0;i<7;i++)h+=`<rect class="c ${i===6?"f":"o"}" style="--i:${i};--a:${i*7}deg" x="4" y="73" width="34" height="55" rx="3"/>`;
+    return svg("left:100%;bottom:.04em;margin-left:.1em;width:1.25em;height:1.45em","0 0 114 132",h)},
+  // six hex trigs pop up, then fire in a pattern
+  hex(){const C=[[20,100],[52,100],[84,100],[36,72],[68,72],[52,44]],D=[0,.8,.4,1.2,.2,1],
+      hp=(x,y,r)=>"M"+[0,1,2,3,4,5].map(k=>{const a=(k*60-90)*Math.PI/180;return f1(x+r*Math.cos(a))+","+f1(y+r*Math.sin(a))}).join("L")+"Z";
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:.88em;height:1em","0 0 106 120",
+      C.map((c,i)=>`<path class="o p" style="--i:${i*1.2}" d="${hp(c[0],c[1],16)}"/><path class="f trig" style="--d:${D[i]}s" d="${hp(c[0],c[1],10)}"/>`).join(""))},
+  // a little diagram draws itself
+  diagram(){const A=[14,100],B=[70,16],C=[142,64],Dd=[80,80],e=[[A,B],[B,C],[C,Dd],[Dd,A],[B,Dd]];
+    return svg("right:0;bottom:100%;margin-bottom:.06em;width:1.3em;height:.95em","0 0 156 114",
+      e.map((p,i)=>`<path class="s d" pathLength="1" style="--i:${i}" d="M${p[0]}L${p[1]}"/>`).join("")+
+      `<circle class="f p" style="--i:0" cx="14" cy="100" r="7"/><rect class="f p" style="--i:2" x="63" y="9" width="14" height="14"/><circle class="o p" style="--i:4" cx="142" cy="64" r="8"/><circle class="f p" style="--i:6" cx="80" cy="80" r="5"/>`)},
+  // a caravan of dots wanders off toward a far city
+  route(){let h="";const q=t=>{const u=1-t;return[u*u*256+2*u*t*150+t*t*14,u*u*124+2*u*t*20+t*t*24]};
+    for(let i=0;i<=15;i++){const p=q(i/15);h+=`<circle class="f p" style="--i:${i}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="${i?3.4:6}"/>`}
+    return svg("right:0;bottom:100%;margin-bottom:-.1em;width:2.2em;height:1.1em","0 0 264 132",h+`<circle class="o p" style="--i:17" cx="14" cy="24" r="11"/>`)},
+  // this month, filling in, today solid
+  month(){const d=new Date(),y=d.getFullYear(),m=d.getMonth(),days=new Date(y,m+1,0).getDate(),start=(new Date(y,m,1).getDay()+6)%7;let h="";
+    for(let n=1;n<=days;n++){const c=(start+n-1)%7,r=Math.floor((start+n-1)/7),x=9+c*17,yy=9+r*17,today=n===d.getDate();
+      h+=`<circle class="${today?"f":"o"} p" style="--i:${(n*.32).toFixed(2)}" cx="${x}" cy="${yy}" r="${today?7:5.5}"/>`}
+    return svg("right:0;bottom:100%;margin-bottom:.1em;width:1.3em;height:1.15em","0 0 120 106",h)},
+  // a circle riding a circle
+  epicycle(){return svg("left:100%;bottom:0;margin-left:.08em;width:.95em;height:.95em","0 0 114 114",
+      `<circle class="o d" pathLength="1" cx="57" cy="57" r="34"/><circle class="f p" cx="57" cy="57" r="3"/>
+       <g class="orb"><circle class="o p" style="--i:6" cx="91" cy="57" r="14"/><g class="orb2"><circle class="f p" style="--i:9" cx="105" cy="57" r="4.5"/></g></g>`)},
+  // three reels, the light running through them
+  reels(){const X=[20,47,74];
+    return svg("left:100%;bottom:.1em;margin-left:.14em;width:.96em;height:.4em","0 0 96 40",
+      X.map((x,i)=>`<circle class="o k p" style="--i:${i*2+1}" cx="${x}" cy="20" r="17"/>`).join("")+
+      X.map((x,i)=>`<circle class="f trig" style="--d:${(i*.53).toFixed(2)}s" cx="${x}" cy="20" r="8"/>`).join(""))},
+  // three arcs of sound, pulsing outward
+  waves(){const A=["M10 62Q50 40 90 62","M20 40Q50 22 80 40","M30 19Q50 6 70 19"];
+    return svg("left:100%;bottom:.1em;margin-left:.12em;width:.8em;height:.58em","0 0 100 72",
+      A.map((d,i)=>`<path class="s d wv" pathLength="1" style="--i:${i*2};--d:${(i*.3).toFixed(1)}s;stroke-width:${9-i*1.5}" d="${d}"/>`).join(""))},
+  // an open book; its pages turn
+  book(){const L="M60 22C46 12 24 10 8 14V70C24 66 46 68 60 78",R="M60 22C74 12 96 10 112 14V70C96 66 74 68 60 78",Q="M60 24C72 15 92 13 106 16V68C92 65 72 66 60 75Z";
+    return svg("left:100%;bottom:.06em;margin-left:.14em;width:1em;height:.7em","0 0 120 84",
+      `<path class="s d" pathLength="1" style="--i:0" d="${L}"/><path class="s d" pathLength="1" style="--i:0" d="${R}"/><path class="s d" pathLength="1" style="--i:3" d="M60 22V78"/>`+
+      [0,1,2].map(i=>`<path class="o k pg" style="--d:${(i*.45).toFixed(2)}s;stroke-width:2.5" d="${Q}"/>`).join(""))},
+  // blocks, connected
+  blocks(){const B=[[2,90],[34,90],[34,58],[66,58],[66,26],[96,0]];let l="",r="";
+    B.forEach((b,i)=>{r+=`<rect class="${i===5?"f":"o"} p" style="--i:${i*1.4}" x="${b[0]}" y="${b[1]}" width="22" height="22"/>`;
+      if(i)l+=`<path class="s d" pathLength="1" style="--i:${i}" d="M${B[i-1][0]+11} ${B[i-1][1]+11}L${b[0]+11} ${b[1]+11}"/>`});
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.15em;height:1.09em","0 0 120 114",`<g style="opacity:.55">${l}</g>`+r)}
+};
+
+/* ---------- the name's plant: measured from the real letters, so it fits any font ---------- */
+const cv=document.createElement("canvas"),cx=cv.getContext("2d",{willReadFrequently:true});
+function ink(font,fs,ch){                    // scan a glyph: per row, the [left,right] of its ink, relative to pen + baseline
+  const W=Math.ceil(fs*1.2),H=Math.ceil(fs*1.5),ox=Math.round(fs*.25),oy=Math.round(fs*1.15);
+  cv.width=W;cv.height=H;cx.font=font;cx.textBaseline="alphabetic";cx.fillText(ch,ox,oy);
+  const d=cx.getImageData(0,0,W,H).data,rows=[];
+  for(let y=0;y<H;y++){let l=-1,r=-1;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>110){if(l<0)l=x;r=x}rows.push(l<0?null:[l-ox,r-ox])}
+  const top=rows.findIndex(r=>r);return{rows,oy,top:top<0?-fs*.7:top-oy};
+}
+function curve(P){                           // a smooth curve through points, + samples of position / heading / arc length
+  let d=`M${f1(P[0][0])} ${f1(P[0][1])}`;const S=[];let len=0,prev=null;
+  for(let i=0;i<P.length-1;i++){const a=P[i-1]||P[i],b=P[i],c=P[i+1],e=P[i+2]||c;
+    const p1=[b[0]+(c[0]-a[0])/6,b[1]+(c[1]-a[1])/6],p2=[c[0]-(e[0]-b[0])/6,c[1]-(e[1]-b[1])/6];
+    d+=`C${f1(p1[0])} ${f1(p1[1])} ${f1(p2[0])} ${f1(p2[1])} ${f1(c[0])} ${f1(c[1])}`;
+    for(let j=prev?1:0;j<=20;j++){const u=j/20,v=1-u,B=k=>v*v*v*b[k]+3*v*v*u*p1[k]+3*v*u*u*p2[k]+u*u*u*c[k],
+        Dv=k=>3*v*v*(p1[k]-b[k])+6*v*u*(p2[k]-p1[k])+3*u*u*(c[k]-p2[k]),x=B(0),y=B(1);
+      if(prev)len+=Math.hypot(x-prev.x,y-prev.y);prev={x,y,a:Math.atan2(Dv(1),Dv(0)),s:len};S.push(prev)}}
+  S.forEach(p=>p.f=len?p.s/len:0);
+  return{d,S,at:f=>S.find(p=>p.f>=f)||S[S.length-1],near:x=>S.reduce((b,p)=>Math.abs(p.x-x)<Math.abs(b.x-x)?p:b)};
+}
+function plant(node){
+  const t=node.querySelector(".t.name"),w=t.querySelector(".w"),cs=getComputedStyle(t),fs=parseFloat(cs.fontSize);
+  const font=`${cs.fontStyle} ${cs.fontWeight} ${fs}px ${cs.fontFamily}`,E=v=>v*fs,T=v=>v.toFixed(2)+"s",DG=180/Math.PI;
+  const rnd=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+  const Ls=[...w.querySelectorAll(".l")].map(s=>({ch:s.textContent,x:s.offsetLeft,w:s.offsetWidth}));
+  const yb=w.querySelector(".bl").offsetTop,W=w.offsetWidth,H=w.offsetHeight;
+  const gI=ink(font,fs,"I"),gx=ink(font,fs,"x"),gA=ink(font,fs,"A"),gi=ink(font,fs,"i");
+  const yc=yb+gI.top,yx=yb+gx.top,band=Math.max(E(.12),yx-yc);
+  // the I: where its stem stands, how thick
+  const mid=gI.rows[Math.round(gI.oy+gI.top/2)]||[0,E(.07)],LI=Ls[0],Ix=LI.x+(mid[0]+mid[1])/2,sw=Math.max(2,(mid[1]-mid[0]+1)*.85);
+  // the A's apex
+  const LA=Ls.find(l=>l.ch==="A"),ar=gA.rows[gA.oy+gA.top]||[E(.3),E(.3)],Ax=LA.x+(ar[0]+ar[1])/2,Ay=yb+gA.top;
+  // the dot of the last i — it becomes a seed head
+  const Li=Ls[Ls.length-1];let y0=gi.oy+gi.top,y1=y0,l=1e9,r=-1e9;
+  while(gi.rows[y1]){l=Math.min(l,gi.rows[y1][0]);r=Math.max(r,gi.rows[y1][1]);y1++}
+  const dx=Li.x+(l+r)/2,dy=yb+(y0+y1-1)/2-gi.oy,dr=Math.max(r-l+1,y1-y0)/2,R=Math.max(dr*1.7,E(.075));
+
+  let back="",fore="",top="";
+  const line=(d,sw,t,dur,lin)=>{const st=`--t:${T(t)};--dur:${T(dur)}${lin?";--ez:linear":""}`;
+    back+=`<path class="hl d" pathLength="1" style="${st}" stroke-width="${f1(sw+E(.032))}" d="${d}"/>`;
+    fore+=`<path class="vn d" pathLength="1" style="${st}" stroke-width="${f1(sw)}" d="${d}"/>`};
+  const leaf=(x,y,deg,L,Wd,t)=>{top+=`<g transform="translate(${f1(x)} ${f1(y)}) rotate(${deg.toFixed(0)})"><g class="lf p" style="--t:${T(t)}">`+
+    `<path class="lb" stroke-width="${f1(E(.014))}" d="M0 0C${f1(L*.3)} ${f1(-Wd)} ${f1(L*.7)} ${f1(-Wd)} ${f1(L)} 0C${f1(L*.7)} ${f1(Wd)} ${f1(L*.3)} ${f1(Wd)} 0 0Z"/>`+
+    `<path class="rb" stroke-width="${f1(E(.005))}" d="M${f1(L*.16)} 0H${f1(L*.74)}"/></g></g>`};
+  const flower=(x,y,rr,t)=>{let h="";for(let k=0;k<5;k++)h+=`<ellipse class="pt" stroke-width="${f1(E(.008))}" cx="0" cy="${f1(-rr*.52)}" rx="${f1(rr*.33)}" ry="${f1(rr*.5)}" transform="rotate(${k*72})"/>`;
+    top+=`<g transform="translate(${f1(x)} ${f1(y)})"><g class="fl p" style="--t:${T(t)}">${h}<circle class="fc" r="${f1(rr*.2)}"/></g></g>`};
+  const tendril=(p,deg,flip,r0,t)=>{const a=deg/DG,c=Math.cos(a),s=Math.sin(a),lead=r0*.9,pts=[[0,0],[lead,0]];
+    for(let j=1;j<=24;j++){const th=j*3*Math.PI/24,rr=r0*PHI**(-th/HP*.85);pts.push([lead+rr*Math.sin(th),-r0+rr*Math.cos(th)])}
+    const C=curve(pts.map(([u,v])=>[p.x+c*u-s*v*flip,p.y+s*u+c*v*flip]));line(C.d,E(.008),t,.9)};
+
+  // 1 — the I's stem draws itself up, and its serifs open as leaves
+  line(`M${f1(Ix)} ${f1(yb+sw*.2)}C${f1(Ix-E(.014))} ${f1(yb-(yb-yc)*.35)} ${f1(Ix+E(.018))} ${f1(yb-(yb-yc)*.7)} ${f1(Ix)} ${f1(yc+E(.01))}`,sw,.12,.85);
+  leaf(Ix,yc+E(.02),-148,E(.1),E(.032),.78);leaf(Ix,yc+E(.02),-32,E(.1),E(.032),.86);
+  leaf(Ix,yb-E(.012),176,E(.1),E(.026),.62);leaf(Ix,yb-E(.012),4,E(.1),E(.026),.7);
+
+  // 2 — a vine leaves the top of the I and climbs across the name, over the A, into the dot of the last i
+  const ym=(yx+yc)/2+band*.06,amp=band*.3,MP=[[Ix,yc+E(.02)],[Ix+E(.05),yc-E(.06)]];let sg=1;
+  Ls.slice(1,-1).forEach(L=>{const c=L.x+L.w/2;
+    if(L.ch==="A")MP.push([Ax,Ay-E(.08)]);else if(L.ch===" ")MP.push([c,ym-amp*.6]);else{MP.push([c,ym+sg*amp]);sg=-sg}});
+  MP.push([dx-R*2.5,dy+R*.15],[dx-R*1.02,dy]);
+  // 3 — a runner leaves the foot of the I and creeps along under the letters
+  const RP=[[Ix,yb],[Ix+E(.06),yb+E(.075)]];sg=1;
+  Ls.slice(1).forEach(L=>{RP.push([L.x+L.w/2,yb+E(sg>0?.105:.05)]);sg=-sg});
+  RP.push([Li.x+Li.w+E(.05),yb+E(.035)]);
+  const M=curve(MP),Rn=curve(RP),tm=1,dm=3.8,tr=1.3,drn=3.4,tM=f=>tm+dm*f,tR=f=>tr+drn*f;
+  line(M.d,E(.021),tm,dm,1);line(Rn.d,E(.015),tr,drn,1);
+
+  for(let f=.06,j=0;f<.94;f+=.045+rnd(j)*.03,j++){const p=M.at(f),sd=j%2?1:-1;
+    leaf(p.x,p.y,p.a*DG+sd*(44+rnd(j+9)*24),E(.085+rnd(j+3)*.035),E(.029+rnd(j+5)*.01),tM(f)+.06)}
+  for(let f=.07,j=0;f<.95;f+=.06+rnd(j+40)*.035,j++){const p=Rn.at(f),sd=j%2?-1:1;
+    leaf(p.x,p.y,p.a*DG+sd*(50+rnd(j+50)*22),E(.068+rnd(j+60)*.03),E(.024+rnd(j+70)*.008),tR(f)+.06)}
+  [[.15,-1],[.5,1],[.72,-1]].forEach(([f,fl],j)=>{const p=M.at(f);tendril(p,p.a*DG+fl*-62,fl,E(.034+j*.006),tM(f)+.1)});
+  [[.32,1],[.66,1]].forEach(([f,fl],j)=>{const p=Rn.at(f);tendril(p,p.a*DG+62,fl,E(.03+j*.005),tR(f)+.1)});
+  { const e=Rn.S[Rn.S.length-1];tendril(e,-82,-1,E(.045),tr+drn); }
+
+  // 4 — sprigs drop between words and letters, tying the two vines together
+  [Ls.find(l=>l.ch===" "),Ls.find(l=>l.ch==="v")].forEach((L,j)=>{if(!L)return;const x=j?L.x:L.x+L.w/2,a=M.near(x),b=Rn.near(x),
+      t=Math.max(tM(a.f),tR(b.f))+.15,k=j?-1:1;
+    line(`M${f1(a.x)} ${f1(a.y)}C${f1(a.x+k*E(.07))} ${f1(a.y+(b.y-a.y)*.35)} ${f1(b.x-k*E(.07))} ${f1(a.y+(b.y-a.y)*.65)} ${f1(b.x)} ${f1(b.y)}`,E(.01),t,.9);
+    leaf(a.x+k*E(.04),a.y+(b.y-a.y)*.4,k>0?-20:200,E(.06),E(.022),t+.45);leaf(b.x-k*E(.035),a.y+(b.y-a.y)*.62,k>0?160:20,E(.055),E(.02),t+.6)});
+
+  // 5 — flowers open on short stems: above the m, on the A, above the r
+  const bloomOn=(p,q,rr,t)=>{line(`M${f1(p.x)} ${f1(p.y)}Q${f1(p.x)} ${f1((p.y+q[1])/2)} ${f1(q[0])} ${f1(q[1])}`,E(.01),t,.5);
+    leaf((p.x+q[0])/2,(p.y+q[1])/2,-30,E(.05),E(.018),t+.3);flower(q[0],q[1],rr,t+.4)};
+  {const p=M.at(.2);bloomOn(p,[p.x+E(.04),Math.min(p.y,ym)-E(.17)],E(.05),tM(.2)+.1)}
+  {const p=M.near(Ax);bloomOn(p,[Ax+E(.025),Ay-E(.25)],E(.062),tM(p.f)+.1)}
+  {const p=M.at(.84);bloomOn(p,[p.x-E(.03),Math.min(p.y,ym)-E(.16)],E(.045),tM(.84)+.1)}
+
+  // 6 — and the dot of the last i becomes a head of seeds on the golden angle
+  const tb=tm+dm-.05;let seeds=`<circle class="bd p" style="--t:${T(tb)}" cx="${f1(dx)}" cy="${f1(dy)}" r="${f1(Math.max(R,dr*1.25)+E(.014))}"/>`;
+  for(let n=1;n<=21;n++){const rr=R*Math.sqrt(n/21),a=n*GA;
+    seeds+=`<circle class="sd p" style="--t:${T(tb+.1+n*.035)}" cx="${f1(dx+rr*Math.cos(a))}" cy="${f1(dy+rr*Math.sin(a))}" r="${f1(E(.009+n*.00042))}"/>`}
+  return{vb:`0 0 ${W} ${H}`,body:back+fore+top+seeds};
+}
+
+const SOC=[
+  {name:"Letterboxd",href:"https://boxd.it/6uYab",g:"reels"},
+  {name:"Spotify",href:"https://open.spotify.com/user/31dxlwhfdibpqjqlg5nhxrflov34",g:"waves"},
+  {name:"Goodreads",href:"https://www.goodreads.com/user/show/100149155",g:"book"}
+];
+const ITEMS=[
+ {slug:"",title:"Iman Anvari",max:720,grow:plant,
+  html:()=>`<span class="t name" role="heading" aria-level="1" aria-label="Iman Anvari"><span class="w" aria-hidden="true">${[..."Iman Anvari"].map((c,i)=>`<span class="l${i?"":" I"}">${c}</span>`).join("")}<span class="bl"></span><svg class="g vine" aria-hidden="true"></svg></span></span>
+    <span class="small">Projects &amp; Experiments, 2026</span><span class="small r" aria-hidden="true">scroll ↘</span>`},
+ {slug:"sankofa",title:"Sankofa",href:"https://esoterorist.github.io/Sankofa/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Sankofa${G.sankofa()}</span></a>`},
+ {slug:"seven-tarots",title:"Seven Tarots",href:"https://esoterorist.github.io/Seven-Tarots/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Seven Tarots${G.cards()}</span></a>`},
+ {slug:"hextrigs",title:"Hextrigs",href:"https://esoterorist.github.io/Hextrigs/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Hextrigs${G.hex()}</span></a>`},
+ {slug:"orpheus",title:"Orpheus",href:"https://esoterorist.github.io/Orpheus/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Orpheus<span class="ghost" aria-hidden="true">Orpheus</span></span></a>`},
+ {slug:"diagram-museum",title:"Diagram Museum",href:"https://esoterorist.github.io/DiagramMuseum/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Diagram Museum${G.diagram()}</span></a>`},
+ {slug:"saadi",title:"سفرهای سعدی",href:"https://esoterorist.github.io/Saadi/",max:872,
+  html:i=>`<a class="t fa" href="${i.href}" lang="fa" dir="rtl"><span class="w">سفرهای سعدی${G.route()}</span></a>`},
+ {slug:"calender",title:"imz Calender",href:"https://esoterorist.github.io/calender/",max:872,
+  html:i=>`<a class="t" href="${i.href}"><span class="w">imz Calender${G.month()}</span></a>`},
+ {slug:"elsewhere",title:"Elsewhere",max:760,
+  html:()=>`<div class="list"><span class="tag">elsewhere</span>${SOC.map(s=>`<a class="t" href="${s.href}" rel="me"><span class="w">${s.name}${G[s.g]()}</span></a>`).join("")}</div>
+    <a class="small" href="mailto:iiman.anvarii@gmail.com">iiman.anvarii@gmail.com</a>`}
+];
+const N=ITEMS.length;
+ITEMS.forEach(it=>it._html=it.html(it));   // build each card's markup once
+/* Epicycle has no link yet. When it does, add it to ITEMS:
+ {slug:"epicycle",title:"Epicycle",href:"https://…",max:760,html:i=>`<a class="t" href="${i.href}"><span class="w">Epicycle${G.epicycle()}</span></a>`},
+ (and to the #links nav above). */
+
+/* ---------- stage ---------- */
+const stage=$("#stage"),geoG=$("#geoG"),KMIN=-2,KMAX=11;
+{let r="";for(let k=-4;k<=18;k++){const q=squareK(k);r+=`<rect x="${f5(q.x)}" y="${f5(q.y)}" width="${f5(q.w)}" height="${f5(q.h)}"/>`}$("#rects").innerHTML=r;
+ // the spiral as 44 cubic curves (exact tangents) instead of 1300 straight segments
+ const s0=-4,s1=18,ds=.5;let p=spiral(s0),q=spiralD(s0),d=`M${f5(p.x)},${f5(p.y)}`;
+ for(let s=s0+ds;s<=s1+1e-9;s+=ds){const p2=spiral(s),q2=spiralD(s),k=ds/3;
+   d+=`C${f5(p.x+q.x*k)},${f5(p.y+q.y*k)} ${f5(p2.x-q2.x*k)},${f5(p2.y-q2.y*k)} ${f5(p2.x)},${f5(p2.y)}`;p=p2;q=q2}
+ $("#spiral").setAttribute("d",d)}
+
+let W=0,H=0,S=1,R0=0,Ps={x:0,y:0},FV=0;
+// fit each card's type once per item (not once per card), and grow the plant once per font change
+function prep(node){
+  const it=node._it,ts=node.querySelectorAll(".t"),fresh=it._fv!==FV;
+  if(fresh)it._fs=[...ts].map(t=>{t.style.fontSize="";const w=t.querySelector(".w").scrollWidth;
+    return w>it.max?(parseFloat(getComputedStyle(t).fontSize)*it.max/w).toFixed(1)+"px":""});
+  ts.forEach((t,j)=>t.style.fontSize=it._fs[j]||"");
+  if(it.grow){
+    if(fresh){try{it._g=it.grow(node)}catch(e){it._g=null}}
+    const v=node.querySelector(".vine");
+    if(v&&it._g&&v._fv!==FV){v._fv=FV;v.setAttribute("viewBox",it._g.vb);v.innerHTML=it._g.body;
+      if(node._on){node.classList.remove("on");void node.offsetWidth;node.classList.add("on")}}   // replay, don't pop in
+  }
+  it._fv=FV;node._fv=FV;
+}
+function make(abs){const it=ITEMS[mod(abs,N)],el=document.createElement("div");el.className="card";el.innerHTML=it._html;el._it=it;return el}
+const slots=[];
+for(let k=KMIN;k<=KMAX;k++){const sq=document.createElement("div"),r=document.createElement("div");sq.className="sq";r.className="rot";sq.appendChild(r);stage.appendChild(sq);slots.push({k,sq,rot:r,node:null})}
+
+let B=null;
+function sync(b){
+  const put=(s,n)=>{s.node=n;s.rot.appendChild(n)};
+  if(B===null){B=b;slots.forEach(s=>put(s,make(B+s.k)));return}
+  if(Math.abs(b-B)>=slots.length){slots.forEach(s=>s.node.remove());B=null;sync(b);return}
+  while(B<b){B++;slots[0].node.remove();for(let i=0;i<slots.length-1;i++)put(slots[i],slots[i+1].node);put(slots.at(-1),make(B+slots.at(-1).k))}
+  while(B>b){B--;slots.at(-1).node.remove();for(let i=slots.length-1;i>0;i--)put(slots[i],slots[i-1].node);put(slots[0],make(B+slots[0].k))}
+}
+
+function fit(){
+  W=innerWidth;H=innerHeight;const land=W/H>=1;R0=land?0:90;
+  S=Math.min(W/(land?PHI:1),H/(land?1:PHI))*.92;
+  const d=rot(R0*Math.PI/180,{x:P.x-PHI/2,y:P.y-.5});Ps={x:W/2+S*d.x,y:H/2+S*d.y};
+  slots.forEach(s=>s.rot.style.transform=`rotate(${-R0}deg)`);kick()}
+
+/* ---------- motion: a critically damped spring on t ---------- */
+const hashIdx=()=>{const h=decodeURIComponent(location.hash.slice(1)),i=ITEMS.findIndex(x=>x.slug&&x.slug===h);return i<0?0:i};
+const goal=hashIdx();
+let t=reduce?goal:goal-1.25,target=t,v=0,active=-1,running=false,last=0;   // hold still until the fonts are in
+const K=reduce?2000:70,DAMP=2*Math.sqrt(K);
+
+function layout(){
+  const b=Math.floor(t),f=t-b;sync(b);
+  const ang=R0*Math.PI/180-f*HP,sc=S*PHI**f,ca=Math.cos(ang)*sc,sa=Math.sin(ang)*sc;
+  geoG.setAttribute("transform",`matrix(${ca} ${sa} ${-sa} ${ca} ${Ps.x-(ca*P.x-sa*P.y)} ${Ps.y-(sa*P.x+ca*P.y)})`);
+  const n=Math.round(t);
+  for(const s of slots){
+    const a=ang+s.k*HP,side=sc*PHI**-s.k,L=side/1000,la=Math.cos(a)*L,lb=Math.sin(a)*L;
+    const tx=Ps.x-1000*(la*P.x-lb*P.y),ty=Ps.y-1000*(lb*P.x+la*P.y),cx=tx+500*(la-lb),cy=ty+500*(lb+la);
+    const vis=side>3&&cx>-side&&cx<W+side&&cy>-side&&cy<H+side;
+    if(vis!==s.vis){s.vis=vis;s.sq.style.visibility=vis?"":"hidden"}
+    if(!vis)continue;
+    s.sq.style.transform=`matrix(${la},${lb},${-lb},${la},${tx},${ty})`;
+    const nd=s.node;
+    if(nd._fv!==FV)prep(nd);
+    const abs=B+s.k,on=abs===n,past=abs<n,nav=!on&&side>14;
+    if(on!==nd._on){nd._on=on;nd.classList.toggle("on",on);nd.setAttribute("aria-hidden",on?"false":"true");for(const x of nd.querySelectorAll("a"))x.tabIndex=on?0:-1}
+    if(past!==nd._past){nd._past=past;nd.classList.toggle("past",past)}
+    if(nav!==s.nav){s.nav=nav;s.sq.classList.toggle("nav",nav)}
+  }
+  const ai=mod(n,N);if(ai!==active){active=ai;document.title=ai?`${ITEMS[ai].title} — Iman Anvari`:"Iman Anvari"}
+}
+function frame(now){
+  let dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
+  while(dt>0){const h=Math.min(dt,1/240);v+=(K*(target-t)-DAMP*v)*h;t+=v*h;dt-=h}
+  const rest=Math.abs(target-t)<1e-4&&Math.abs(v)<1e-4;
+  if(rest){t=target;v=0}
+  layout();
+  if(rest){running=false;
+    if(started&&!drag&&Number.isInteger(t)){const sl=ITEMS[mod(t,N)].slug,u=sl?"#"+sl:location.pathname+location.search;
+      if(u!==(sl?location.hash:location.pathname+location.search+location.hash))history.replaceState(null,"",u)}
+    return}
+  requestAnimationFrame(frame)}
+function kick(){if(!running){running=true;last=performance.now();requestAnimationFrame(frame)}}
+const goTo=x=>{target=x;kick()},go=d=>goTo(Math.round(target)+d);
+const goItem=i=>{const n=Math.round(target);let d=mod(i-n,N);if(d>N/2)d-=N;goTo(n+d)};
+
+/* ---------- input ---------- */
+let snap=0,started=false;
+addEventListener("wheel",e=>{e.preventDefault();if(e.ctrlKey||!started)return;
+  const m=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1,d=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*m;
+  target+=d/(Math.min(innerWidth,innerHeight)*.8);kick();
+  clearTimeout(snap);snap=setTimeout(()=>goTo(Math.round(target)),130)},{passive:false});
+
+let drag=null,dragged=false;
+stage.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"||!started)return;
+  drag={id:e.pointerId,y:e.clientY,x:e.clientX,t0:target,pd:0,pt:e.timeStamp,vel:0};dragged=false});
+addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;
+  const dy=drag.y-e.clientY,dx=drag.x-e.clientX,dd=Math.abs(dy)>=Math.abs(dx)?dy:dx;if(Math.abs(dd)>8)dragged=true;
+  const unit=Math.min(innerWidth,innerHeight)*.55,dt=Math.max(1,e.timeStamp-drag.pt);
+  drag.vel=.75*drag.vel+.25*((dd-drag.pd)/dt/unit*1000);drag.pd=dd;drag.pt=e.timeStamp;   // velocity on the same axis as the drag
+  target=drag.t0+dd/unit;kick()});
+const release=e=>{if(!drag||(e&&e.pointerId!==drag.id))return;
+  const fling=e&&e.timeStamp-drag.pt<90?drag.vel*.22:0;drag=null;goTo(Math.round(target+Math.max(-1.4,Math.min(1.4,fling))))};
+addEventListener("pointerup",release);addEventListener("pointercancel",release);
+
+stage.addEventListener("click",e=>{
+  if(dragged){e.preventDefault();dragged=false;return}
+  const sq=e.target.closest(".sq");if(!sq)return;const s=slots.find(x=>x.sq===sq);if(!s)return;
+  if(!s.node._on){e.preventDefault();goTo(B+s.k);return}
+  if(e.target.closest("a"))return;
+  const it=s.node._it;if(it.href)location.href=it.href;else go(1)});
+
+addEventListener("keydown",e=>{const k=e.key;if(e.metaKey||e.ctrlKey||e.altKey||!started)return;
+  if(["ArrowDown","ArrowRight","PageDown"," "].includes(k)){e.preventDefault();go(1)}
+  else if(["ArrowUp","ArrowLeft","PageUp"].includes(k)){e.preventDefault();go(-1)}
+  else if(k==="Home"){e.preventDefault();goItem(0)}
+  else if(k==="End"){e.preventDefault();goItem(N-1)}
+  else if(k==="Enter"&&!e.target.closest("a,button")){const it=ITEMS[active];if(it&&it.href)location.href=it.href}});
+addEventListener("hashchange",()=>goItem(hashIdx()));
+let rz=0;addEventListener("resize",()=>{cancelAnimationFrame(rz);rz=requestAnimationFrame(fit)});
+
+const root=document.documentElement,meta=$('meta[name="theme-color"]');
+const paint=()=>{meta.content=getComputedStyle(root).getPropertyValue("--paper").trim()||"#2108c9"};
+try{const th=localStorage.getItem("theme");if(th==="light"||th==="dark")root.dataset.theme=th}catch(e){}
+$("#theme").onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme=dark?"light":"dark";paint();try{localStorage.setItem("theme",root.dataset.theme)}catch(e){}};
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",paint);
+paint();
+
+fit();
+/* fonts: ask for them by name (fonts.ready alone can resolve before anything has asked), re-fit when they land, then begin */
+const begin=()=>{if(started)return;started=true;goTo(goal)};
+const refit=()=>{FV++;kick()};
+if(document.fonts){
+  Promise.all(["400 236px 'Instrument Serif'","700 120px 'Inter Tight'","400 30px 'IBM Plex Mono'","700 120px 'Noto Naskh Arabic'"]
+    .map(f=>document.fonts.load(f,f.includes("Naskh")?"سعدی":"Iman").catch(()=>{}))).then(()=>{refit();begin()});
+  document.fonts.addEventListener?.("loadingdone",refit);
+}else begin();
+setTimeout(begin,900);
+})();
+</script>
+</body>
+</html>
