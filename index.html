@@ -90,24 +90,10 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 .card.on .pg,.t:hover .pg{animation:flip .9s cubic-bezier(.5,0,.3,1) both;animation-delay:calc(var(--d) + 1s)}
 @keyframes flip{0%{opacity:1;transform:scaleX(1)}100%{opacity:1;transform:scaleX(-1)}}
 
-/* the name: its I sprouts, and a little garland grows across the name */
-.name .bl{display:inline-block;width:0;height:0}
-.name .I{transition:color .3s}
-.card.on .name .I,.t.name:hover .I{color:transparent;transition:color .6s ease .25s}
-.vine{left:0;top:0;width:100%;height:100%}
-.vine .vn{fill:none;stroke:var(--ink);stroke-linecap:round;stroke-linejoin:round}
-.vine .lf,.vine .fc{fill:var(--ink)}
-.vine .bd{fill:var(--paper)}
-.vine .lf{transform-origin:0 50%}
-.vine .fl{transform:scale(0) rotate(-90deg)}
-.vine .sw{transform-box:fill-box;transform-origin:center}
-.vine .d{transition:stroke-dashoffset .35s ease}
-.vine .p{transition:transform .3s ease}
-.card.on .vine .d,.t:hover .vine .d{transition:stroke-dashoffset var(--dur,.6s) var(--ez,cubic-bezier(.45,0,.55,1)) var(--t,0s)}
-.card.on .vine .p,.t:hover .vine .p{transition:transform .7s var(--spring) var(--t,0s)}
-.card.on .vine .fl,.t:hover .vine .fl{transform:scale(1) rotate(0deg)}
-.card.on .vine .sw,.t:hover .vine .sw{animation:sway 3.2s ease-in-out calc(var(--t,0s) + .8s) infinite}
-@keyframes sway{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-9deg)}70%{transform:rotate(9deg)}}
+/* the name: each letter drifts on its own tiny orbit, phases spaced by the golden angle — like type floating on still water */
+.name .l{display:inline-block;transform-origin:50% 60%}
+.card.on .name .l{animation:drift 6.18s linear infinite;animation-delay:var(--ph)}
+@keyframes drift{from{transform:rotate(0deg) translateX(.007em) rotate(0deg)}to{transform:rotate(360deg) translateX(.007em) rotate(-360deg)}}
 
 /* light/dark: a single dot — solid by day, a ring by night */
 .theme{position:fixed;z-index:3;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));
@@ -213,76 +199,6 @@ const G={
     return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.15em;height:1.09em","0 0 120 114",`<g style="opacity:.55">${l}</g>`+r)}
 };
 
-/* ---------- the name's plant: measured from the real letters, so it fits any font ---------- */
-const cv=document.createElement("canvas"),cx=cv.getContext("2d",{willReadFrequently:true});
-function ink(font,fs,ch){                    // scan a glyph: per row, the [left,right] of its ink, relative to pen + baseline
-  const W=Math.ceil(fs*1.2),H=Math.ceil(fs*1.5),ox=Math.round(fs*.25),oy=Math.round(fs*1.15);
-  cv.width=W;cv.height=H;cx.font=font;cx.textBaseline="alphabetic";cx.fillText(ch,ox,oy);
-  const d=cx.getImageData(0,0,W,H).data,rows=[];
-  for(let y=0;y<H;y++){let l=-1,r=-1;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>110){if(l<0)l=x;r=x}rows.push(l<0?null:[l-ox,r-ox])}
-  const top=rows.findIndex(r=>r);return{rows,oy,top:top<0?-fs*.7:top-oy};
-}
-function curve(P){                           // a smooth curve through points, + samples of position / arc length
-  let d=`M${f1(P[0][0])} ${f1(P[0][1])}`;const S=[];let len=0,prev=null;
-  for(let i=0;i<P.length-1;i++){const a=P[i-1]||P[i],b=P[i],c=P[i+1],e=P[i+2]||c;
-    const p1=[b[0]+(c[0]-a[0])/6,b[1]+(c[1]-a[1])/6],p2=[c[0]-(e[0]-b[0])/6,c[1]-(e[1]-b[1])/6];
-    d+=`C${f1(p1[0])} ${f1(p1[1])} ${f1(p2[0])} ${f1(p2[1])} ${f1(c[0])} ${f1(c[1])}`;
-    for(let j=prev?1:0;j<=16;j++){const u=j/16,v=1-u,B=k=>v*v*v*b[k]+3*v*v*u*p1[k]+3*v*u*u*p2[k]+u*u*u*c[k],x=B(0),y=B(1);
-      if(prev)len+=Math.hypot(x-prev.x,y-prev.y);prev={x,y,s:len};S.push(prev)}}
-  S.forEach(p=>p.f=len?p.s/len:0);
-  return{d,near:x=>S.reduce((b,p)=>Math.abs(p.x-x)<Math.abs(b.x-x)?p:b)};
-}
-function plant(node){
-  const t=node.querySelector(".t.name"),w=t.querySelector(".w"),cs=getComputedStyle(t),fs=parseFloat(cs.fontSize);
-  const font=`${cs.fontStyle} ${cs.fontWeight} ${fs}px ${cs.fontFamily}`,E=v=>v*fs,T=v=>v.toFixed(2)+"s";
-  const Ls=[...w.querySelectorAll(".l")].map(s=>({ch:s.textContent,x:s.offsetLeft,w:s.offsetWidth})),n=Ls.length,Li=Ls[n-1];
-  const yb=w.querySelector(".bl").offsetTop,W=w.offsetWidth,H=w.offsetHeight;
-  const gI=ink(font,fs,"I"),gx=ink(font,fs,"x"),gi=ink(font,fs,"i"),yc=yb+gI.top,yx=yb+gx.top;
-  // the I's stem: where it stands, how thick
-  const mid=gI.rows[Math.round(gI.oy+gI.top/2)]||[0,E(.07)],Ix=Ls[0].x+(mid[0]+mid[1])/2,sw=Math.max(2,mid[1]-mid[0]+1);
-  // the dot of the last i: it will open into a daisy
-  let y0=gi.oy+gi.top,y1=y0,l=1e9,r=-1e9;
-  while(gi.rows[y1]){l=Math.min(l,gi.rows[y1][0]);r=Math.max(r,gi.rows[y1][1]);y1++}
-  const dx=Li.x+(l+r)/2,dy=yb+(y0+y1-1)/2-gi.oy,dr=Math.max(r-l+1,y1-y0)/2;
-  // the skyline of the letters in between, so the garland never touches them
-  const pad=Math.ceil(E(.3)),CW=Math.ceil(W)+2*pad,CH=Math.ceil(yb)+2*pad;
-  cv.width=CW;cv.height=CH;cx.font=font;cx.textBaseline="alphabetic";
-  for(let i=1;i<n-1;i++)cx.fillText(Ls[i].ch,Ls[i].x+pad,yb+pad);
-  const px=cx.getImageData(0,0,CW,CH).data,sky=new Float32Array(CW).fill(yb),seen=new Uint8Array(CW);
-  for(let y=0;y<CH;y++)for(let x=0;x<CW;x++)if(!seen[x]&&px[(y*CW+x)*4+3]>90){seen[x]=1;sky[x]=y-pad}
-  const win=E(.07),env=x=>{let m=yb;for(let i=Math.max(0,Math.round(x-win+pad)),e=Math.min(CW-1,Math.round(x+win+pad));i<=e;i++)m=Math.min(m,sky[i]);return m};
-
-  // the garland: from the top of the I, a scallop over every letter, a droop between the words, into the i's dot
-  const cl=E(.06),amp=E(.055),P=[[Ix,yc+E(.03)]],dips=[],tops=[];let droop=null;
-  for(let i=1;i<n;i++){const L=Ls[i];
-    P.push([L.x,Math.min(env(L.x),yx)-cl*.6]);if(i>1&&Ls[i-1].ch!==" "&&L.ch!==" ")dips.push(P.at(-1));
-    if(i===n-1)break;const c=L.x+L.w/2;
-    if(L.ch===" "){P.push([c,yx-cl*.1]);droop=P.at(-1)}else{P.push([c,env(c)-cl-amp]);tops.push({p:P.at(-1),big:L.ch==="A"})}}
-  const ri=dr*1.12;P.push([dx-ri*2.3,dy+ri*.3]);
-  const M=curve(P),tv=.8,dv=2.3,at=x=>tv+dv*M.near(x).f;
-
-  let back="",top="";
-  const line=(d,wd,t0,dur,lin)=>{back+=`<path class="vn d" pathLength="1" style="--t:${T(t0)};--dur:${T(dur)}${lin?";--ez:linear":""}" stroke-width="${f1(wd)}" d="${d}"/>`};
-  const leaf=(x,y,deg,L,Wd,t0)=>{top+=`<g transform="translate(${f1(x)} ${f1(y)}) rotate(${Math.round(deg)})"><path class="lf p" style="--t:${T(t0)}" d="M0 0C${f1(L*.12)} ${f1(-Wd*1.25)} ${f1(L*.78)} ${f1(-Wd*1.3)} ${f1(L)} 0C${f1(L*.78)} ${f1(Wd*1.3)} ${f1(L*.12)} ${f1(Wd*1.25)} 0 0Z"/></g>`};
-  const bud=(x,y,rr,t0)=>{top+=`<circle class="fc p" style="--t:${T(t0)}" cx="${f1(x)}" cy="${f1(y)}" r="${f1(rr)}"/>`};
-  const daisy=(x,y,rr,t0)=>{let h="";for(let k=0;k<6;k++){const a=k*Math.PI/3;h+=`<circle class="fc" cx="${f1(rr*1.55*Math.cos(a))}" cy="${f1(rr*1.55*Math.sin(a))}" r="${f1(rr*.62)}"/>`}
-    top+=`<g transform="translate(${f1(x)} ${f1(y)})"><g class="fl p" style="--t:${T(t0)}"><g class="sw" style="--t:${T(t0)}">${h}<circle class="bd" r="${f1(rr)}"/><circle class="fc" r="${f1(rr*.42)}"/></g></g></g>`};
-
-  // 1 — the I turns into a seedling
-  line(`M${f1(Ix)} ${f1(yb-sw*.45)}C${f1(Ix-E(.01))} ${f1(yb-(yb-yc)*.4)} ${f1(Ix+E(.012))} ${f1(yb-(yb-yc)*.7)} ${f1(Ix)} ${f1(yc+E(.03))}`,sw*.9,.1,.7);
-  leaf(Ix,yc+E(.03),-132,E(.15),E(.055),.6);leaf(Ix,yc+E(.03),-48,E(.15),E(.055),.68);
-  leaf(Ix,yb-E(.01),-168,E(.07),E(.022),.45);leaf(Ix,yb-E(.01),-12,E(.07),E(.022),.5);
-  // 2 — the garland draws across, sprouting as it goes: leaves in every dip, buds and daisies on every scallop
-  line(M.d,E(.028),tv,dv,1);
-  dips.forEach(p=>{const t0=at(p[0]);leaf(p[0],p[1],-128,E(.085),E(.032),t0+.05);leaf(p[0],p[1],-52,E(.085),E(.032),t0+.12)});
-  tops.forEach(({p,big},j)=>{const t0=at(p[0])+.08;
-    if(big||j%3===1)daisy(p[0],p[1]-E(.016),E(big?.042:.034),t0);else bud(p[0],p[1]-E(.036),E(.024),t0)});
-  if(droop){const t0=at(droop[0]);line(`M${f1(droop[0])} ${f1(droop[1])}V${f1(droop[1]+E(.06))}`,E(.014),t0,.3);bud(droop[0],droop[1]+E(.08),E(.028),t0+.2)}
-  // 3 — and the dot of the last i opens into a daisy
-  daisy(dx,dy,ri,tv+dv-.05);
-  return{vb:`0 0 ${W} ${H}`,body:back+top};
-}
-
 const SOC=[
   {name:"Letterboxd",href:"https://boxd.it/6uYab",g:"reels"},
   {name:"Spotify",href:"https://open.spotify.com/user/31dxlwhfdibpqjqlg5nhxrflov34",g:"waves"},
@@ -290,8 +206,8 @@ const SOC=[
   {name:"Are.na",href:"https://are.na/i-a-tm-ild_dlli",g:"blocks"}
 ];
 const ITEMS=[
- {slug:"",title:"Iman Anvari",max:720,grow:plant,
-  html:()=>`<span class="t name" role="heading" aria-level="1" aria-label="Iman Anvari"><span class="w" aria-hidden="true">${[..."Iman Anvari"].map((c,i)=>`<span class="l${i?"":" I"}">${c}</span>`).join("")}<span class="bl"></span><svg class="g vine" aria-hidden="true"></svg></span></span>
+ {slug:"",title:"Iman Anvari",max:720,
+  html:()=>`<span class="t name" role="heading" aria-level="1" aria-label="Iman Anvari"><span class="w" aria-hidden="true">${[..."Iman Anvari"].map((c,i)=>c===" "?" ":`<span class="l" style="--ph:${(-((i*.618)%1)*6.18).toFixed(2)}s">${c}</span>`).join("")}</span></span>
     <span class="small">Projects &amp; Experiments, 2026</span><span class="small r" aria-hidden="true">scroll ↘</span>`},
  {slug:"sankofa",title:"Sankofa",href:"https://esoterorist.github.io/Sankofa/",max:760,
   html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Sankofa${G.sankofa()}</span></a>`},
@@ -327,18 +243,12 @@ const stage=$("#stage"),geoG=$("#geoG"),KMIN=-2,KMAX=11;
  $("#spiral").setAttribute("d",d)}
 
 let W=0,H=0,S=1,R0=0,Ps={x:0,y:0},FV=0;
-// fit each card's type once per item (not once per card), and grow the plant once per font change
+// fit each card's type once per item (not once per card)
 function prep(node){
   const it=node._it,ts=node.querySelectorAll(".t"),fresh=it._fv!==FV;
   if(fresh)it._fs=[...ts].map(t=>{t.style.fontSize="";const w=t.querySelector(".w").scrollWidth;
     return w>it.max?(parseFloat(getComputedStyle(t).fontSize)*it.max/w).toFixed(1)+"px":""});
   ts.forEach((t,j)=>t.style.fontSize=it._fs[j]||"");
-  if(it.grow){
-    if(fresh){try{it._g=it.grow(node)}catch(e){it._g=null}}
-    const v=node.querySelector(".vine");
-    if(v&&it._g&&v._fv!==FV){v._fv=FV;v.setAttribute("viewBox",it._g.vb);v.innerHTML=it._g.body;
-      if(node._on){node.classList.remove("on");void node.offsetWidth;node.classList.add("on")}}   // replay, don't pop in
-  }
   it._fv=FV;node._fv=FV;
 }
 const cards=new Map();   // abs index -> card. A card is built once, then only its transform changes.
