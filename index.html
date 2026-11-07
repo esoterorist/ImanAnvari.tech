@@ -49,6 +49,14 @@ body{background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-fo
 a.small::after{content:"";display:inline-block;width:0;margin-left:14px;vertical-align:middle;border-top:2px dashed currentColor;transition:width .618s var(--spring)}
 a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 
+/* the front page: arrows out either side */
+.arr{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:18px;font:400 30px/1 var(--mono);letter-spacing:.04em;color:var(--soft);text-decoration:none;white-space:nowrap}
+.arr.l{left:64px}.arr.r{right:64px}
+.arr i{font:400 64px/1 var(--mono);font-style:normal;display:inline-block;transition:transform .618s var(--spring)}
+.arr:hover{color:var(--ink)}.arr.l:hover i{transform:translateX(-16px)}.arr.r:hover i{transform:translateX(16px)}
+/* one line under each project */
+.desc{max-width:872px;overflow:hidden;text-overflow:ellipsis;font-size:28px}
+
 /* elsewhere: a short stack of links */
 .list{position:absolute;left:64px;bottom:150px}
 .list .tag{position:static;display:block;margin:0 0 22px .04em}
@@ -85,6 +93,10 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 /* spotify: waves pulse outward */
 .card.on .wv,.t:hover .wv{animation:wave 1.8s ease-in-out infinite;animation-delay:calc(var(--d) + 1.1s)}
 @keyframes wave{0%,100%{opacity:1}50%{opacity:.28}}
+/* signal bench: the beam sweeps left to right */
+.sw{opacity:0;transform-box:view-box}
+.card.on .sw,.t:hover .sw{animation:sweep 2s linear 1.3s infinite}
+@keyframes sweep{0%{opacity:0;transform:translateX(8px)}10%,88%{opacity:1}100%{opacity:0;transform:translateX(124px)}}
 /* goodreads: pages turn, once each */
 .pg{opacity:0;transform-origin:60px 50px}
 .card.on .pg,.t:hover .pg{animation:flip .9s cubic-bezier(.5,0,.3,1) both;animation-delay:calc(var(--d) + 1s)}
@@ -103,7 +115,7 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 .theme:hover::before{transform:scale(1.25)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme::before{background:transparent}}
 :root[data-theme="dark"] .theme::before{background:transparent}
-.theme:focus-visible,.t:focus-visible,.small:focus-visible{outline:2px dashed var(--ink);outline-offset:6px}
+.theme:focus-visible,.t:focus-visible,.small:focus-visible,.arr:focus-visible{outline:2px dashed var(--ink);outline-offset:6px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){#spiral{animation:none}*{transition-duration:0s!important;transition-delay:0s!important;animation:none!important}}
 </style>
@@ -113,6 +125,7 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 <main id="stage" aria-label="Projects on a golden spiral. Scroll, swipe or use the arrow keys."></main>
 <button class="theme" id="theme" aria-label="Switch light or dark"></button>
 <nav class="sr" id="links" aria-label="Links">
+  <a href="https://esoterorist.github.io/SignalBench/">Signal Bench</a>
   <a href="https://esoterorist.github.io/Sankofa/">Sankofa</a>
   <a href="https://esoterorist.github.io/Seven-Tarots/">Seven Tarots</a>
   <a href="https://esoterorist.github.io/Hextrigs/">Hextrigs</a>
@@ -152,6 +165,13 @@ const G={
     for(let j=1;j<4;j++)h+=`<path class="s d" pathLength="1" style="--i:${4+j*2};stroke-width:2;opacity:.55" d="M${f1(2.3+j*32)} 98V12"/><path class="f p" style="--i:${8+j*1.5}" d="M${f1(-3.7+j*32)} 4h12l-6 7z"/>`;
     return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.32em;height:1em","0 0 132 100",
       h+`<g class="ph"><path class="s" style="stroke-width:3.5" d="M0 8V104"/><circle class="f" cx="0" cy="104" r="5"/></g>`)},
+  // an oscilloscope: graticule, a sine trace drawing itself, the beam sweeping across
+  scope(){let w="M6 50";for(let i=1;i<=60;i++){const x=6+i*2;w+=`L${x} ${f1(50-30*Math.sin(i/60*4*Math.PI))}`}
+    let g="";for(let i=1;i<4;i++)g+=`<path class="s d" pathLength="1" style="--i:${i};stroke-width:1.5;opacity:.45" d="M${6+i*30} 8V92"/>`;
+    g+=`<path class="s d" pathLength="1" style="--i:2;stroke-width:1.5;opacity:.45" d="M6 50H126"/>`;
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.32em;height:1em","0 0 132 100",
+      `<rect class="o p" style="--i:0" x="4" y="6" width="124" height="88" rx="6"/>`+g+
+      `<path class="s d" pathLength="1" style="--i:4;stroke-width:3.5" d="${w}"/><g class="sw"><path class="s" style="stroke-width:2;opacity:.7" d="M0 10V90"/></g>`)},
   // seven cards fan out
   cards(){let h="";for(let i=0;i<7;i++)h+=`<rect class="c ${i===6?"f":"o"}" style="--i:${i};--a:${i*7}deg" x="4" y="73" width="34" height="55" rx="3"/>`;
     return svg("left:100%;bottom:.04em;margin-left:.1em;width:1.25em;height:1.45em","0 0 114 132",h)},
@@ -208,21 +228,24 @@ const SOC=[
 const ITEMS=[
  {slug:"",title:"Iman Anvari",max:720,
   html:()=>`<span class="t name" role="heading" aria-level="1" aria-label="Iman Anvari"><span class="w" aria-hidden="true">${[..."Iman Anvari"].map((c,i)=>c===" "?" ":`<span class="l" style="--ph:${(-((i*.618)%1)*6.18).toFixed(2)}s">${c}</span>`).join("")}</span></span>
-    <span class="small">Projects &amp; Experiments, 2026</span><span class="small r" aria-hidden="true">scroll ↘</span>`},
+    <a class="arr l" href="#elsewhere" aria-label="Handles"><i aria-hidden="true">←</i>Handles</a><a class="arr r" href="#signal-bench" aria-label="Projects">Projects<i aria-hidden="true">→</i></a>
+    <span class="small">Projects &amp; Experiments, 2026</span>`},
+ {slug:"signal-bench",title:"Signal Bench",href:"https://esoterorist.github.io/SignalBench/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Signal Bench${G.scope()}</span></a><span class="small desc">A scope, spectrum and tuner for tuning sound.</span>`},
  {slug:"sankofa",title:"Sankofa",href:"https://esoterorist.github.io/Sankofa/",max:760,
-  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Sankofa${G.sankofa()}</span></a>`},
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Sankofa${G.sankofa()}</span></a><span class="small desc">A 16-pad sample machine in the browser.</span>`},
  {slug:"seven-tarots",title:"Seven Tarots",href:"https://esoterorist.github.io/Seven-Tarots/",max:760,
-  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Seven Tarots${G.cards()}</span></a>`},
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Seven Tarots${G.cards()}</span></a><span class="small desc">Draw and read cards from antique tarot decks.</span>`},
  {slug:"hextrigs",title:"Hextrigs",href:"https://esoterorist.github.io/Hextrigs/",max:760,
-  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Hextrigs${G.hex()}</span></a>`},
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Hextrigs${G.hex()}</span></a><span class="small desc">A six-voice drum machine and step sequencer.</span>`},
  {slug:"orpheus",title:"Orpheus",href:"https://esoterorist.github.io/Orpheus/",max:872,
-  html:i=>`<a class="t" href="${i.href}"><span class="w">Orpheus<span class="ghost" aria-hidden="true">Orpheus</span></span></a>`},
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Orpheus<span class="ghost" aria-hidden="true">Orpheus</span></span></a><span class="small desc">A generative ambient music instrument.</span>`},
  {slug:"diagram-museum",title:"Diagram Museum",href:"https://esoterorist.github.io/DiagramMuseum/",max:872,
-  html:i=>`<a class="t" href="${i.href}"><span class="w">Diagram Museum${G.diagram()}</span></a>`},
+  html:i=>`<a class="t" href="${i.href}"><span class="w">Diagram Museum${G.diagram()}</span></a><span class="small desc">An archive of diagrams redrawn from theory.</span>`},
  {slug:"saadi",title:"سفرهای سعدی",href:"https://esoterorist.github.io/Saadi/",max:872,
-  html:i=>`<a class="t fa" href="${i.href}" lang="fa" dir="rtl"><span class="w">سفرهای سعدی${G.route()}</span></a>`},
+  html:i=>`<a class="t fa" href="${i.href}" lang="fa" dir="rtl"><span class="w">سفرهای سعدی${G.route()}</span></a><span class="small desc r">A map of Saadi’s travels, linked to his poems.</span>`},
  {slug:"calender",title:"imz Calender",href:"https://esoterorist.github.io/calender/",max:872,
-  html:i=>`<a class="t" href="${i.href}"><span class="w">imz Calender${G.month()}</span></a>`},
+  html:i=>`<a class="t" href="${i.href}"><span class="w">imz Calender${G.month()}</span></a><span class="small desc">A year calendar, to-do list and diary in one.</span>`},
  {slug:"elsewhere",title:"Elsewhere",max:760,
   html:()=>`<div class="list"><span class="tag">elsewhere</span>${SOC.map(s=>`<a class="t" href="${s.href}" rel="me"><span class="w">${s.name}${G[s.g]()}</span></a>`).join("")}</div>
     <a class="small" href="mailto:iiman.anvarii@gmail.com">iiman.anvarii@gmail.com</a>`}
