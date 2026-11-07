@@ -90,6 +90,10 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 .ph{opacity:0}
 .card.on .ph,.t:hover .ph{animation:back 2.4s cubic-bezier(.5,0,.5,1) 1.1s infinite}
 @keyframes back{0%{opacity:0;transform:translateX(124px)}12%,85%{opacity:1}100%{opacity:0;transform:translateX(4px)}}
+/* funtunfunefu: two tracks, one clock — the cursor steps forward across both */
+.stp{opacity:0;transform-box:view-box}
+.card.on .stp,.t:hover .stp{animation:stepf 1.92s steps(8) 1.1s infinite}
+@keyframes stepf{0%{opacity:1;transform:translateX(0)}100%{opacity:1;transform:translateX(128px)}}
 /* spotify: waves pulse outward */
 .card.on .wv,.t:hover .wv{animation:wave 1.8s ease-in-out infinite;animation-delay:calc(var(--d) + 1.1s)}
 @keyframes wave{0%,100%{opacity:1}50%{opacity:.28}}
@@ -125,6 +129,7 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 <main id="stage" aria-label="Projects on a golden spiral. Scroll, swipe or use the arrow keys."></main>
 <button class="theme" id="theme" aria-label="Switch light or dark"></button>
 <nav class="sr" id="links" aria-label="Links">
+  <a href="https://esoterorist.github.io/FTF16/">Funtunfunefu</a>
   <a href="https://esoterorist.github.io/SignalBench/">Signal Bench</a>
   <a href="https://esoterorist.github.io/Sankofa/">Sankofa</a>
   <a href="https://esoterorist.github.io/Seven-Tarots/">Seven Tarots</a>
@@ -165,6 +170,11 @@ const G={
     for(let j=1;j<4;j++)h+=`<path class="s d" pathLength="1" style="--i:${4+j*2};stroke-width:2;opacity:.55" d="M${f1(2.3+j*32)} 98V12"/><path class="f p" style="--i:${8+j*1.5}" d="M${f1(-3.7+j*32)} 4h12l-6 7z"/>`;
     return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.32em;height:1em","0 0 132 100",
       h+`<g class="ph"><path class="s" style="stroke-width:3.5" d="M0 8V104"/><circle class="f" cx="0" cy="104" r="5"/></g>`)},
+  // two rows of eight steps share one cursor, like the two crocodiles that share one stomach
+  steps(){const A=[1,0,0,1,0,1,0,0, 0,0,1,0,1,0,1,1];let h="";
+    A.forEach((a,i)=>{const c=i%8,row=i>>3;h+=`<rect class="${a?"f":"o"} p" style="--i:${(c*.7+row*.35).toFixed(2)}" x="${4+c*16}" y="${row?58:22}" width="12" height="20" rx="2.5"/>`});
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.32em;height:1em","0 0 132 100",
+      h+`<g class="stp"><rect class="o" style="stroke-width:2.5;fill:none" x="1" y="10" width="18" height="80" rx="4"/></g>`)},
   // an oscilloscope: graticule, a sine trace drawing itself, the beam sweeping across
   scope(){let w="M6 50";for(let i=1;i<=60;i++){const x=6+i*2;w+=`L${x} ${f1(50-30*Math.sin(i/60*4*Math.PI))}`}
     let g="";for(let i=1;i<4;i++)g+=`<path class="s d" pathLength="1" style="--i:${i};stroke-width:1.5;opacity:.45" d="M${6+i*30} 8V92"/>`;
@@ -228,8 +238,10 @@ const SOC=[
 const ITEMS=[
  {slug:"",title:"Iman Anvari",max:720,
   html:()=>`<span class="t name" role="heading" aria-level="1" aria-label="Iman Anvari"><span class="w" aria-hidden="true">${[..."Iman Anvari"].map((c,i)=>c===" "?" ":`<span class="l" style="--ph:${(-((i*.618)%1)*6.18).toFixed(2)}s">${c}</span>`).join("")}</span></span>
-    <a class="arr l" href="#elsewhere" aria-label="Handles"><i aria-hidden="true">←</i>Handles</a><a class="arr r" href="#signal-bench" aria-label="Projects">Projects<i aria-hidden="true">→</i></a>
+    <a class="arr l" href="#elsewhere" aria-label="Handles"><i aria-hidden="true">←</i>Handles</a><a class="arr r" href="#funtunfunefu" aria-label="Projects">Projects<i aria-hidden="true">→</i></a>
     <span class="small">Projects &amp; Experiments, 2026</span>`},
+ {slug:"funtunfunefu",title:"Funtunfunefu",href:"https://esoterorist.github.io/FTF16/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Funtunfunefu${G.steps()}</span></a><span class="small desc">A 16-step sample sequencer with chops and FX.</span>`},
  {slug:"signal-bench",title:"Signal Bench",href:"https://esoterorist.github.io/SignalBench/",max:760,
   html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Signal Bench${G.scope()}</span></a><span class="small desc">A scope, spectrum and tuner for tuning sound.</span>`},
  {slug:"sankofa",title:"Sankofa",href:"https://esoterorist.github.io/Sankofa/",max:760,
