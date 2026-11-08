@@ -8,14 +8,14 @@
 <meta name="theme-color" content="#2108c9">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@400;700&family=IBM+Plex+Mono&family=Noto+Naskh+Arabic:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@400;700&family=Archivo:wdth,wght@62..125,100..200&family=Noto+Naskh+Arabic:wght@700&display=swap">
 <style>
 /* a golden rectangle, squares shrinking by φ, turning forever around its eye */
 :root{
   --paper:#2108c9; --ink:#fff; --soft:#c9c2ff; --loop:#b9b0ff;
   --display:"Instrument Serif","Times New Roman",Georgia,serif;
   --body:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --mono:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif; /* thin, wide, boxy grotesk for the small type */
   --naskh:"Noto Naskh Arabic","Geeza Pro",Tahoma,serif;
   --spring:cubic-bezier(.3,1.5,.5,1);
   color-scheme:dark;
@@ -43,16 +43,16 @@ body{background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-fo
 .t .w{position:relative;display:inline-block}
 .t.name{font:400 236px/.9 var(--display);letter-spacing:-.03em}
 .t.fa{left:auto;right:64px;font:700 120px/1.2 var(--naskh);letter-spacing:0}
-.tag{position:absolute;left:.04em;bottom:100%;margin-bottom:.12em;font:400 26px/1 var(--mono);letter-spacing:.08em;color:var(--soft)}
-.small{position:absolute;left:64px;bottom:88px;font:400 30px/1 var(--mono);color:var(--soft);text-decoration:none;white-space:nowrap}
+.tag{position:absolute;left:.04em;bottom:100%;margin-bottom:.12em;font:100 26px/1 var(--mono);font-stretch:118%;letter-spacing:.08em;color:var(--soft)}
+.small{position:absolute;left:64px;bottom:88px;font:100 30px/1 var(--mono);font-stretch:118%;color:var(--soft);text-decoration:none;white-space:nowrap}
 .small.r{left:auto;right:64px}
 a.small::after{content:"";display:inline-block;width:0;margin-left:14px;vertical-align:middle;border-top:2px dashed currentColor;transition:width .618s var(--spring)}
 a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 
 /* the front page: arrows out either side */
-.arr{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:18px;font:400 30px/1 var(--mono);letter-spacing:.04em;color:var(--soft);text-decoration:none;white-space:nowrap}
+.arr{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:18px;font:100 30px/1 var(--mono);font-stretch:118%;letter-spacing:.04em;color:var(--soft);text-decoration:none;white-space:nowrap}
 .arr.l{left:64px}.arr.r{right:64px}
-.arr i{font:400 64px/1 var(--mono);font-style:normal;display:inline-block;transition:transform .618s var(--spring)}
+.arr i{font:100 64px/1 var(--mono);font-stretch:118%;font-style:normal;display:inline-block;transition:transform .618s var(--spring)}
 .arr:hover{color:var(--ink)}.arr.l:hover i{transform:translateX(-16px)}.arr.r:hover i{transform:translateX(16px)}
 /* one line under each project */
 .desc{max-width:872px;overflow:hidden;text-overflow:ellipsis;font-size:28px}
@@ -390,7 +390,7 @@ fit();
 const begin=()=>{if(started)return;started=true;goTo(goal)};
 const refit=()=>{FV++;kick()};
 if(document.fonts){
-  Promise.all(["400 236px 'Instrument Serif'","700 120px 'Inter Tight'","400 30px 'IBM Plex Mono'","700 120px 'Noto Naskh Arabic'"]
+  Promise.all(["400 236px 'Instrument Serif'","700 120px 'Inter Tight'","100 30px 'Archivo'","700 120px 'Noto Naskh Arabic'"]
     .map(f=>document.fonts.load(f,f.includes("Naskh")?"سعدی":"Iman").catch(()=>{}))).then(()=>{refit();begin()});
   document.fonts.addEventListener?.("loadingdone",refit);
 }else begin();
