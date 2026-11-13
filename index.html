@@ -132,6 +132,7 @@ a.small:hover{color:var(--ink)}a.small:hover::after{width:110px}
 <main id="stage" aria-label="Projects on a golden spiral. Scroll, swipe or use the arrow keys."></main>
 <button class="theme" id="theme" aria-label="Switch light or dark"></button>
 <nav class="sr" id="links" aria-label="Links">
+  <a href="https://esoterorist.github.io/akoma/">Akoma Ntoaso</a>
   <a href="https://esoterorist.github.io/FTF16/">Funtunfunefu</a>
   <a href="https://esoterorist.github.io/SignalBench/">Signal Bench</a>
   <a href="https://esoterorist.github.io/Sankofa/">Sankofa</a>
@@ -173,6 +174,13 @@ const G={
     for(let j=1;j<4;j++)h+=`<path class="s d" pathLength="1" style="--i:${4+j*2};stroke-width:2;opacity:.55" d="M${f1(2.3+j*32)} 98V12"/><path class="f p" style="--i:${8+j*1.5}" d="M${f1(-3.7+j*32)} 4h12l-6 7z"/>`;
     return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.32em;height:1em","0 0 132 100",
       h+`<g class="ph"><path class="s" style="stroke-width:3.5" d="M0 8V104"/><circle class="f" cx="0" cy="104" r="5"/></g>`)},
+  // three machines, patched together; the signal hops port to port down the cables
+  patch(){const M=[[4,6],[88,6],[46,60]],P=[[16,28,.9],[32,28,0],[100,28,.6],[116,28,1.2],[58,80,.3],[74,80,.45]],
+      C=["M32 28C32 62 58 46 58 80","M74 80C74 46 100 62 100 28","M116 28C116 -10 16 -10 16 28"];
+    return svg("left:100%;bottom:.04em;margin-left:.12em;width:1.32em;height:1em","0 0 132 100",
+      M.map((m,i)=>`<rect class="o p" style="--i:${i*1.5}" x="${m[0]}" y="${m[1]}" width="40" height="34" rx="5"/>`).join("")+
+      C.map((d,i)=>`<path class="s d" pathLength="1" style="--i:${4+i*2};${i==2?"opacity:.45;stroke-width:2.5":""}" d="${d}"/>`).join("")+
+      P.map((p,i)=>`<circle class="o k p" style="--i:${3+i*.6}" cx="${p[0]}" cy="${p[1]}" r="4.5"/><circle class="f trig" style="--d:${p[2]}s" cx="${p[0]}" cy="${p[1]}" r="2.6"/>`).join(""))},
   // two rows of eight steps share one cursor, like the two crocodiles that share one stomach
   steps(){const A=[1,0,0,1,0,1,0,0, 0,0,1,0,1,0,1,1];let h="";
     A.forEach((a,i)=>{const c=i%8,row=i>>3;h+=`<rect class="${a?"f":"o"} p" style="--i:${(c*.7+row*.35).toFixed(2)}" x="${4+c*16}" y="${row?58:22}" width="12" height="20" rx="2.5"/>`});
@@ -241,8 +249,10 @@ const SOC=[
 const ITEMS=[
  {slug:"",title:"Iman Anvari",max:720,
   html:()=>`<span class="t name" role="heading" aria-level="1" aria-label="Iman Anvari"><span class="w" aria-hidden="true">${[..."Iman Anvari"].map((c,i)=>c===" "?" ":`<span class="l" style="--ph:${(-((i*.618)%1)*6.18).toFixed(2)}s">${c}</span>`).join("")}</span></span>
-    <a class="arr l" href="#elsewhere" aria-label="Handles"><i aria-hidden="true">←</i>Handles</a><a class="arr r" href="#funtunfunefu" aria-label="Projects">Projects<i aria-hidden="true">→</i></a>
+    <a class="arr l" href="#elsewhere" aria-label="Handles"><i aria-hidden="true">←</i>Handles</a><a class="arr r" href="#akoma-ntoaso" aria-label="Projects">Projects<i aria-hidden="true">→</i></a>
     <span class="small">Projects &amp; Experiments, 2026</span>`},
+ {slug:"akoma-ntoaso",title:"Akoma Ntoaso",href:"https://esoterorist.github.io/akoma/",max:760,
+  html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Akoma Ntoaso${G.patch()}</span></a><span class="small desc">A patch rack: wire machines together and play.</span>`},
  {slug:"funtunfunefu",title:"Funtunfunefu",href:"https://esoterorist.github.io/FTF16/",max:760,
   html:i=>`<a class="t" href="${i.href}"><span class="w"><span class="tag">new</span>Funtunfunefu${G.steps()}</span></a><span class="small desc">A 16-step sample sequencer with chops and FX.</span>`},
  {slug:"signal-bench",title:"Signal Bench",href:"https://esoterorist.github.io/SignalBench/",max:760,
